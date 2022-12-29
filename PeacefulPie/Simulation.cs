@@ -18,16 +18,11 @@ public class Simulation : MonoBehaviour {
 
     [Header("Size of each simulation step, in seconds of game time.")]
     public float SimulationStepSize = 0.02f;
+    [Tooltip("Automatically a simulation step each FixedStep?")]
+    public bool AutoRunSimulations = false;
 
     List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
     List<INeedUpdate> registeredNeedUpdates = new List<INeedUpdate>();
-
-    [HideInInspector]
-    public bool AutoRunSimulations = true;
-
-    void Awake() {
-        Physics.autoSimulation = false;
-    }
 
     public void RegisterNeedFixedUpdate(INeedFixedUpdate needFixedUpdate) {
         registeredNeedFixedUpdates.Add(needFixedUpdate);
@@ -60,7 +55,6 @@ public class Simulation : MonoBehaviour {
     }
 
     public void Simulate() {
-        // Debug.Log("simulation.simulate");
         float deltaTime = SimulationStepSize;
         RunFixedUpdates(deltaTime);
         RunUpdates(deltaTime);
