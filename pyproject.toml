@@ -1,11 +1,12 @@
 [tool.poetry]
 name = "peaceful-pie"
-version = "0.2.0"
+version = "0.3.0"
 description = "Control Unity from Python!"
 authors = ["Hugh Perkins <hughperkins@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [{include = "peaceful_pie"}]
+repository = "https://github.com/hughperkins/peaceful-pie"
 
 [tool.poetry.dependencies]
 python = "^3.10"
