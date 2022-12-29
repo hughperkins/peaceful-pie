@@ -19,7 +19,7 @@ public class Simulation : MonoBehaviour {
     [Header("Size of each simulation step, in seconds of game time.")]
     public float SimulationStepSize = 0.02f;
     [Tooltip("Automatically a simulation step each FixedStep?")]
-    public bool AutoRunSimulations = false;
+    public bool AutoRunSimulations = true;
 
     List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
     List<INeedUpdate> registeredNeedUpdates = new List<INeedUpdate>();
