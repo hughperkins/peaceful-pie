@@ -145,3 +145,4 @@ Unity.Cecil.dll
 *Generated*
 *.CopyComplete
 obj/
+bin/
