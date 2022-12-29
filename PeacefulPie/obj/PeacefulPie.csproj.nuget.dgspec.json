@@ -1,0 +1,72 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/hugh/git/peaceful-pie/PeacefulPie/PeacefulPie.csproj": {}
+  },
+  "projects": {
+    "/Users/hugh/git/peaceful-pie/PeacefulPie/PeacefulPie.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/hugh/git/peaceful-pie/PeacefulPie/PeacefulPie.csproj",
+        "projectName": "PeacefulPie",
+        "projectPath": "/Users/hugh/git/peaceful-pie/PeacefulPie/PeacefulPie.csproj",
+        "packagesPath": "/Users/hugh/.nuget/packages/",
+        "outputPath": "/Users/hugh/git/peaceful-pie/PeacefulPie/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/hugh/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.1"
+        ],
+        "sources": {
+          "/Users/hugh/git/unity-priv/MyGridWorld1/Assets/Plugins": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.1": {
+            "targetAlias": "netstandard2.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "targetAlias": "netstandard2.1",
+          "dependencies": {
+            "AustinHarris.JsonRpc": {
+              "target": "Package",
+              "version": "[1.2.3, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "NETStandard.Library": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
