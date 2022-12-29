@@ -25,15 +25,25 @@ class NetworkEvent{
 
 
 public class NetManager : MonoBehaviour {
-    public int Port;
+	[Tooltip("Network port to listen on.")]
+    public int ListenPort = 9000;
+	[Tooltip("Network address to listen on. If not sure, put 'localhost'")]
+    public string ListenAddress = "localhost";
+	[Tooltip("Optional filepath to write logs to.")]
+	public string? LogFilepath;
+	[Tooltip("milliseconds to sleep after writing to logfile. Helps prevent runaway logs")]
+	public int SleepAfterLogLineMilliseconds = 100;
 
 	HttpListener listener;
 	BlockingCollection<NetworkEvent> networkEvents = new BlockingCollection<NetworkEvent>();
 
 	void MyDebug(string msg) {
-		string DateTime = System.DateTime.Now.ToString("yyyyMMdd HH:mm:ss.fff"); 
-		using (StreamWriter sw = File.AppendText("/tmp/log.txt")) {
-			sw.WriteLine($"{DateTime} {msg}");
+		if(LogFilepath != null) {
+			string DateTime = System.DateTime.Now.ToString("yyyyMMdd HH:mm:ss.fff"); 
+			using (StreamWriter sw = File.AppendText(LogFilepath)) {
+				sw.WriteLine($"{DateTime} {msg}");
+			}
+			Thread.Sleep(SleepAfterLogLineMilliseconds);
 		}
 	}
 
@@ -50,8 +60,8 @@ public class NetManager : MonoBehaviour {
 		string[] args = System.Environment.GetCommandLineArgs();
 		for(int i = 0; i < args.Length; i++) {
 			if(args[i] == "--port") {
-				Port = int.Parse(args[i + 1]);
-				Debug.Log($"Using port {Port}");
+				ListenPort = int.Parse(args[i + 1]);
+				Debug.Log($"Using port {ListenPort}");
 			} else if(args[i] == "--help") {
 				Debug.Log("Specify port with '--port [port number]'");
 				Application.Quit();
@@ -60,7 +70,7 @@ public class NetManager : MonoBehaviour {
 		}
 
 		listener = new HttpListener();
-		listener.Prefixes.Add($"http://localhost:{Port}/");
+		listener.Prefixes.Add($"http://{ListenAddress}:{ListenPort}/");
 
 		listener.Start();
 		Task.Run(listenLoop);
@@ -71,6 +81,17 @@ public class NetManager : MonoBehaviour {
 		listener.Stop();
 		listener.Abort();
 		listener.Close();
+	}
+
+	void FixedUpdate() {
+		int numIts = 0;
+		if(networkEvents.Count > 0 || isDedicated) {
+			NetworkEvent networkEvent = networkEvents.Take();
+			networkEvent.serverReply = JsonRpcProcessor.ProcessSync(
+				Handler.DefaultSessionId(), networkEvent.clientRequest, null);
+			networkEvent.serverReplied.Set();
+			numIts += 1;
+		}
 	}
 
 	void handleRequest(HttpListenerContext context) {
@@ -109,20 +130,9 @@ public class NetManager : MonoBehaviour {
 		handleRequest(context);
 	}
 
-	void FixedUpdate() {
-		int numIts = 0;
-		if(networkEvents.Count > 0 || isDedicated) {
-			NetworkEvent networkEvent = networkEvents.Take();
-			networkEvent.serverReply = JsonRpcProcessor.ProcessSync(
-				Handler.DefaultSessionId(), networkEvent.clientRequest, null);
-			networkEvent.serverReplied.Set();
-			numIts += 1;
-		}
-	}
-
 	void listenLoop()
 	{
-		File.OpenWrite("/tmp/log.txt").Close();
+		File.OpenWrite("netmanager-log.txt").Close();
 		while (true)
 		{
 			try {
@@ -141,7 +151,7 @@ public class NetManager : MonoBehaviour {
 					}
 					try {
 						listener = new HttpListener();
-						listener.Prefixes.Add($"http://localhost:{Port}/");
+						listener.Prefixes.Add($"http://{ListenAddress}:{ListenPort}/");
 
 						listener.Start();
 						MyDebug($"Restarted listener");
@@ -161,7 +171,6 @@ public class NetManager : MonoBehaviour {
 					break;
 				}
 				MyDebug($"HttpListenerException caught in httplistener {e}");
-				Thread.Sleep(100);
 			}
 			catch(System.Threading.ThreadAbortException) {
 				MyDebug("threadabortexception");
@@ -169,7 +178,6 @@ public class NetManager : MonoBehaviour {
 			}
 			catch(Exception e) {
 				MyDebug($"Exception caught in httplistener {e}");
-				Thread.Sleep(100);
 			}
 		}
 	}
