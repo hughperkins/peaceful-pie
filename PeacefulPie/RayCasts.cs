@@ -32,7 +32,7 @@ public class RayCasts: MonoBehaviour {
     public float RayRadius = 0;
     public bool ShowRaysInEditor = true;
     public bool ShowRaysInPlayer = false;
-    public List<string> DetectableTags;
+    public List<string> DetectableTags = new List<string>();
 
     class Ray {
         public Vector3 direction;

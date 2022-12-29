@@ -15,7 +15,7 @@ class NetworkEvent{
 	// we'll keep everything as json strings here, and do the conversion
 	// in the main thread
 	public string clientRequest;
-	public string serverReply;
+	public string? serverReply;
 	public AutoResetEvent serverReplied = new AutoResetEvent(false);
 	public NetworkEvent(string clientRequest) {
 		this.clientRequest = clientRequest;
@@ -34,7 +34,7 @@ public class NetManager : MonoBehaviour {
 	[Tooltip("milliseconds to sleep after writing to logfile. Helps prevent runaway logs")]
 	public int SleepAfterLogLineMilliseconds = 100;
 
-	HttpListener listener;
+	HttpListener? listener;
 	BlockingCollection<NetworkEvent> networkEvents = new BlockingCollection<NetworkEvent>();
 
 	void MyDebug(string msg) {
@@ -78,6 +78,9 @@ public class NetManager : MonoBehaviour {
 
     public void OnDisable() {
 		Debug.Log("shutting down listener");
+		if(listener is null) {
+			return;
+		}
 		listener.Stop();
 		listener.Abort();
 		listener.Close();
@@ -106,7 +109,7 @@ public class NetManager : MonoBehaviour {
 		NetworkEvent networkEvent = new NetworkEvent(bodyText);
 		networkEvents.Add(networkEvent);
 		networkEvent.serverReplied.WaitOne();
-		string res = networkEvent.serverReply;
+		string? res = networkEvent.serverReply;
 
 		using HttpListenerResponse resp = context.Response;
 		resp.Headers.Set("Content-Type", "application/json");
@@ -119,14 +122,18 @@ public class NetManager : MonoBehaviour {
 	}
 
 	public void listenOnce() {
-		HttpListenerContext context;
-		context = listener.GetContext();
+		if(listener is null) {
+			return;
+		}
+		HttpListenerContext context = listener.GetContext();
 		handleRequest(context);
 	}
 
 	async public void listenOnceAsync() {
-		HttpListenerContext context;
-		context = await listener.GetContextAsync();
+		if(listener is null) {
+			return;
+		}
+		HttpListenerContext context = await listener.GetContextAsync();
 		handleRequest(context);
 	}
 
@@ -143,7 +150,9 @@ public class NetManager : MonoBehaviour {
 				if(gameObject.activeSelf) {
 					MyDebug("Looks like we are supposed to be still active. Lets reopen...");
 					try {
-						listener.Abort();
+						if(listener is not null) {
+							listener.Abort();
+						}
 					}
 					catch(Exception e) {
 						MyDebug($"exception during attempted abort {e}");
