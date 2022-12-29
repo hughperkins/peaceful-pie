@@ -15,7 +15,7 @@ class NetworkEvent{
 	// we'll keep everything as json strings here, and do the conversion
 	// in the main thread
 	public string clientRequest;
-	public string? serverReply;
+	public string serverReply;
 	public AutoResetEvent serverReplied = new AutoResetEvent(false);
 	public NetworkEvent(string clientRequest) {
 		this.clientRequest = clientRequest;
@@ -27,41 +27,37 @@ class NetworkEvent{
 public class NetManager : MonoBehaviour {
     public int Port;
 
-	HttpListener? listener;
+	HttpListener listener;
 	BlockingCollection<NetworkEvent> networkEvents = new BlockingCollection<NetworkEvent>();
 
 	void MyDebug(string msg) {
+		string DateTime = System.DateTime.Now.ToString("yyyyMMdd HH:mm:ss.fff"); 
 		using (StreamWriter sw = File.AppendText("/tmp/log.txt")) {
-			sw.WriteLine(msg);
+			sw.WriteLine($"{DateTime} {msg}");
 		}
 	}
 
-	class RpcService : JsonRpcService {
-		// this is only for turning sync on/off
-		NetManager netManager;
-		public RpcService(NetManager netManager) {
-			this.netManager = netManager;
-		}
-		[JsonRpcMethod]
-		private void stopUpdates()
-		{
-			// we stop running updates, just listen for network
-			this.netManager.stopUpdates();
-		}
-		[JsonRpcMethod]
-		private void startUpdates()
-		{
-			// restart running Update
-			this.netManager.startUpdates();
-		}
+	bool isDedicated;
+
+	public bool IsDedicated()
+	{
+		return Screen.currentResolution.refreshRate == 0;
 	}
-
-	RpcService? rpcService;
-
-	private bool updatesPaused;
 
     public void OnEnable() {
-		rpcService = new RpcService(this);
+		isDedicated = IsDedicated();
+
+		string[] args = System.Environment.GetCommandLineArgs();
+		for(int i = 0; i < args.Length; i++) {
+			if(args[i] == "--port") {
+				Port = int.Parse(args[i + 1]);
+				Debug.Log($"Using port {Port}");
+			} else if(args[i] == "--help") {
+				Debug.Log("Specify port with '--port [port number]'");
+				Application.Quit();
+				return;
+			}
+		}
 
 		listener = new HttpListener();
 		listener.Prefixes.Add($"http://localhost:{Port}/");
@@ -72,9 +68,6 @@ public class NetManager : MonoBehaviour {
 
     public void OnDisable() {
 		Debug.Log("shutting down listener");
-		if(listener is null) {
-			return;
-		}
 		listener.Stop();
 		listener.Abort();
 		listener.Close();
@@ -92,8 +85,7 @@ public class NetManager : MonoBehaviour {
 		NetworkEvent networkEvent = new NetworkEvent(bodyText);
 		networkEvents.Add(networkEvent);
 		networkEvent.serverReplied.WaitOne();
-		
-		string? res = networkEvent.serverReply;
+		string res = networkEvent.serverReply;
 
 		using HttpListenerResponse resp = context.Response;
 		resp.Headers.Set("Content-Type", "application/json");
@@ -106,33 +98,20 @@ public class NetManager : MonoBehaviour {
 	}
 
 	public void listenOnce() {
-		if(listener is null) {
-			return;
-		}
 		HttpListenerContext context;
 		context = listener.GetContext();
 		handleRequest(context);
 	}
 
 	async public void listenOnceAsync() {
-		if(listener is null) {
-			return;
-		}
-		HttpListenerContext context = await listener.GetContextAsync();
+		HttpListenerContext context;
+		context = await listener.GetContextAsync();
 		handleRequest(context);
 	}
 
-	public void stopUpdates() {
-		updatesPaused = true;
-	}
-
-	public void startUpdates() {
-		updatesPaused = false;
-	}
-
-	void Update() {
+	void FixedUpdate() {
 		int numIts = 0;
-		while(networkEvents.Count > 0 || (updatesPaused && numIts < 10)) {
+		if(networkEvents.Count > 0 || isDedicated) {
 			NetworkEvent networkEvent = networkEvents.Take();
 			networkEvent.serverReply = JsonRpcProcessor.ProcessSync(
 				Handler.DefaultSessionId(), networkEvent.clientRequest, null);
@@ -143,15 +122,54 @@ public class NetManager : MonoBehaviour {
 
 	void listenLoop()
 	{
+		File.OpenWrite("/tmp/log.txt").Close();
 		while (true)
 		{
 			try {
 				listenOnce();
 			}
-			catch(Exception) {
-				using (StreamWriter sw = File.AppendText("/tmp/log.txt")) {
-					sw.WriteLine("Exception caught in httplistener");
+			catch(ObjectDisposedException) {
+				MyDebug("objectdisposedexception");
+				if(gameObject.activeSelf) {
+					MyDebug("Looks like we are supposed to be still active. Lets reopen...");
+					try {
+						listener.Abort();
+					}
+					catch(Exception e) {
+						MyDebug($"exception during attempted abort {e}");
+						MyDebug($"(Ignoring exception))");
+					}
+					try {
+						listener = new HttpListener();
+						listener.Prefixes.Add($"http://localhost:{Port}/");
+
+						listener.Start();
+						MyDebug($"Restarted listener");
+					}
+					catch(Exception e) {
+						MyDebug($"error when trying to restart listener {e}");
+						throw e;
+					}
+				} else {
+					// shutdown
+					break;
 				}
+			}
+			catch(System.Net.HttpListenerException e) {
+				if(e.Message == "Listener closed") {
+					MyDebug("listener closed");
+					break;
+				}
+				MyDebug($"HttpListenerException caught in httplistener {e}");
+				Thread.Sleep(100);
+			}
+			catch(System.Threading.ThreadAbortException) {
+				MyDebug("threadabortexception");
+				break;
+			}
+			catch(Exception e) {
+				MyDebug($"Exception caught in httplistener {e}");
+				Thread.Sleep(100);
 			}
 		}
 	}

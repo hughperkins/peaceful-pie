@@ -144,3 +144,4 @@ Unity.Cecil.dll
 *.FileListAbsolute.txt
 *Generated*
 *.CopyComplete
+obj/
