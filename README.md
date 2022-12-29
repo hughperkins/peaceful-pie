@@ -33,3 +33,7 @@ pip install -U peaceful-pie
     - python 3.10
     - Unity 2021.3.16.f1
 - please create an issue if your preferred platform is not supported (I'm guessing I might need to downgrade Python a little? Let me know!)
+
+# Dev
+
+Note: if you're on a Silicon Mac, and you're using Visual Studio Code, highly recommend downgrading the C# omnisharp extension to 24.4, which solves lots of weird error messages about references.
