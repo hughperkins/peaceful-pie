@@ -1,4 +1,5 @@
 using UnityEngine;
+
 class DedicatedFrameRate: MonoBehaviour {
 	public bool isDedicated()
 	{
