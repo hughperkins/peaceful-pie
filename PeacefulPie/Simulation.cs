@@ -58,6 +58,8 @@ public class Simulation : MonoBehaviour {
         float deltaTime = SimulationStepSize;
         RunFixedUpdates(deltaTime);
         RunUpdates(deltaTime);
-        Physics.Simulate(deltaTime);
+        if(!Physics.autoSimulation) {
+            Physics.Simulate(deltaTime);
+        }
     }
 }
