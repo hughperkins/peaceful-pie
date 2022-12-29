@@ -26,3 +26,10 @@ You should be good to go :)
 ```
 pip install -U peaceful-pie
 ```
+
+# Requirements
+
+- currently tested with:
+    - python 3.10
+    - Unity 2021.3.16.f1
+- please create an issue if your preferred platform is not supported (I'm guessing I might need to downgrade Python a little? Let me know!)
