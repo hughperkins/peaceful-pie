@@ -127,3 +127,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+## mine
+
+UnityEditor*.dll
+UnityEditor*.pdb
+UnityEditor*.xml
+UnityEngine*.dll
+UnityEngine*.pdb
+UnityEngine*.xml
+Unity.Cecil.dll
+
+*.pdb
+*.cache
+*.FileListAbsolute.txt
+*Generated*
+*.CopyComplete
