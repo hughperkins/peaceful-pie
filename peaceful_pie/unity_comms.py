@@ -13,9 +13,10 @@ class CSException(Exception):
 
 
 class UnityComms:
-    def __init__(self, RLResultType: Type) -> None:
+    def __init__(self, logfile: Optional[str] = None) -> None:
         self.session = requests.Session()
         self.jsonrpc_id = 0
+        self.logfile = logfile
 
     def _rpc_request_dict(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         res = {"method": method, "params": params, "jsonrpc": "2.0", "id": self.jsonrpc_id}
@@ -23,8 +24,13 @@ class UnityComms:
         return res
 
     def rpc_call(
-        self, unity_port: int, method: str, params_dict: dict[str, Any], ResultClass: Optional[Type]
+        self,
+        unity_port: int,
+        method: str,
+        params_dict: Optional[dict[str, Any]] = None,
+        ResultClass: Optional[Type] = None
     ) -> Any:
+        params_dict = params_dict if params_dict else {}
         payload = self._rpc_request_dict(method, params_dict)
         url = URL_TEMPL.format(port=unity_port)
         response = None
@@ -44,10 +50,13 @@ class UnityComms:
                 if "error" in res_d:
                     print("res_d", res_d)
                     err_data = res_d["error"]["data"]
-                    print(err_data["ClassName"])
-                    print(err_data["Message"])
-                    print(err_data["StackTraceString"].replace("\\n", "\n"))
-                    raise CSException(err_data["Message"])
+                    if isinstance(err_data, dict):
+                        print(err_data["ClassName"])
+                        print(err_data["Message"])
+                        print(err_data["StackTraceString"].replace("\\n", "\n"))
+                        raise CSException(err_data["Message"])
+                    else:
+                        raise CSException(err_data)
                 if ResultClass is None:
                     return None
                 response = init_dataclass(res_d["result"], ResultClass)
@@ -60,10 +69,12 @@ class UnityComms:
                 print("payload", payload)
                 print("res", res)
                 print("res.content", res.content)
-                with open('/tmp/rl1.log', 'w') as f:
-                    datetime_str = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
-                    f.write(f"{datetime_str}: payload {payload}\n")
-                    f.write(f"{datetime_str}: res {res}\n")
-                    f.write(f"{datetime_str}: res.content {str(res.content)}\n")
-                    f.write(f"{datetime_str}: e {e}\n")
+                if self.logfile is not None:
+                    with open(self.logfile, 'a') as f:
+                        datetime_str = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
+                        f.write(f"{datetime_str}: payload {payload}\n")
+                        f.write(f"{datetime_str}: res {res}\n")
+                        f.write(f"{datetime_str}: res.content {str(res.content)}\n")
+                        f.write(f"{datetime_str}: e {e}\n")
+                time.sleep(0.1)
         return response
