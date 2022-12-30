@@ -47,7 +47,7 @@ public class NetManager : MonoBehaviour {
 	BlockingCollection<NetworkEvent> networkEvents = new BlockingCollection<NetworkEvent>();
 
 	void MyDebug(string msg) {
-		if(LogFilepath != null) {
+		if(LogFilepath != null && LogFilepath != "") {
 			string DateTime = System.DateTime.Now.ToString("yyyyMMdd HH:mm:ss.fff");
 			using(StreamWriter sw = File.AppendText(LogFilepath)) {
 				sw.WriteLine($"{DateTime} {msg}");
