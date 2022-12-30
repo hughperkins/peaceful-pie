@@ -11,6 +11,6 @@ jobs:
           command: |
             bash ci/build-ci.sh
 workflows:
-  sample:
+  main:
     jobs:
       - build
