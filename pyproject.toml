@@ -12,6 +12,7 @@ repository = "https://github.com/hughperkins/peaceful-pie"
 enable = true
 vcs = "git"
 style = "semver"
+strict = true
 
 [tool.poetry.dependencies]
 python = "^3.10"
