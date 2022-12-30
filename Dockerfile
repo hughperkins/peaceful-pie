@@ -38,14 +38,6 @@ RUN curl -fSL --output dotnet.tar.gz https://dotnetcli.azureedge.net/dotnet/Sdk/
     # Trigger first run experience by running arbitrary cmd
     && dotnet help
 
-# RUN sh -c 'echo "deb https://hub.unity3d.com/linux/repos/deb stable main" > /etc/apt/sources.list.d/unityhub.list' \
-#     && wget -qO - https://hub.unity3d.com/linux/keys/public | apt-key add - \
-#     && apt update \
-#     && apt-get install -y unityhub
-
-RUN apt-get update \
-    && apt-get install -y libgtk-3-0 libarchive-dev
-
 RUN curl -fSL --output UnitySetup-2021.3.16f1 'https://download.unity3d.com/download_unity/4016570cf34f/UnitySetup-2021.3.16f1?_ga=2.256438923.1493529091.1672006725-1442771051.1669639379' \
     && chmod +x UnitySetup-2021.3.16f1 \
     && echo y |./UnitySetup-2021.3.16f1 --unattended --install-location /opt/Unity > /dev/null
