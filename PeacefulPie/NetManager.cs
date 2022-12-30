@@ -150,7 +150,7 @@ public class NetManager : MonoBehaviour {
 				if(gameObject.activeSelf) {
 					MyDebug("Looks like we are supposed to be still active. Lets reopen...");
 					try {
-						if(listener is not null) {
+						if(listener != null) {
 							listener.Abort();
 						}
 					}

@@ -1,30 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-+  <PropertyGroup>
-+    <TargetFramework>netstandard2.1</TargetFramework>
-+    <Nullable>enable</Nullable>
-+  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
   <ItemGroup>
-     <!-- <Compile Include="Assets/DungeonEscape/Scripts/Simulation.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/RayCasts.cs" />
-     <Compile Include="Assets/PushBlock/Scripts/PushBlockSettings.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/QuitHandler.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/DungeonEscapeEnvController.cs" />
-     <Compile Include="Assets/SharedAssets/Scripts/ProjectSettingsOverrides.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/RLRpcService.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/PushAgentEscape.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/SimpleNPC.cs" />
-     <Compile Include="Assets/SharedAssets/Scripts/CollisionCallbacks.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/DedicatedFrameRate.cs" />
-     <Compile Include="Assets/DungeonEscape/Scripts/NetManager.cs" />
-     <None Include="Assets/csc.rsp" />
-     <None Include="Assets/DungeonEscape/python/gitlog.txt" />
-     <None Include="Assets/SharedAssets/Materials/GridPatternShader.shader" />
-     <None Include="Assets/SharedAssets/Materials/ShaderOutline.shader" />
-     <None Include="Assets/DungeonEscape/python/gitdiff.txt" />
-     <None Include="Assets/SharedAssets/Materials/ShaderRadialGrid.shader" /> -->
-    <Reference Include="UnityEngine">
-        <HintPath>/Applications/Unity/Hub/Editor/2021.3.16f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
+    <None Remove="Newtonsoft.Json" />
+    <None Remove="AustinHarris.JsonRpc" />
+    <None Remove="Unity" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="AustinHarris.JsonRpc" Version="1.2.3" />
+
+        <Reference Include="UnityEngine">
+        <HintPath>/Applications/Unity/Editor/2021.3.16f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
+        <HintPath>/opt/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
         <HintPath>/Applications/Unity/Hub/Editor/2021.3.16f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.AccessibilityModule.dll</HintPath>
@@ -602,5 +594,6 @@
     <Reference Include="Unity.SysrootPackage.Editor">
         <HintPath>/Users/hugh/git/unity-priv/NoMLAgentsJsonRpc/Library/ScriptAssemblies/Unity.SysrootPackage.Editor.dll</HintPath>
     </Reference>
+
   </ItemGroup>
 </Project>
