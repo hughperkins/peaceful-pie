@@ -23,13 +23,27 @@ class UnityComms:
         self.jsonrpc_id += 1
         return res
 
+    def set_blocking_listen(self, unity_port: int, blocking: bool) -> None:
+        self.rpc_call(unity_port, "setBlockingListen", {"blocking": blocking}, retry=False)
+
     def rpc_call(
         self,
         unity_port: int,
         method: str,
         params_dict: Optional[dict[str, Any]] = None,
-        ResultClass: Optional[Type] = None
+        ResultClass: Optional[Type] = None,
+        retry: bool = True
     ) -> Any:
+        """
+        :param unity_port: int The Port that our Unity application is listening on
+        :param method: str The json rpc method we want to call. Usually this is the name of the method
+        :param params_dict: Optional[dict[str, Any]] Any parameters we want to pass into the method,
+            keyed by parameter name
+            Can provide structured data using dataclasses
+        :param ResultClass: Optional[Type] If not None, then the returned json dict will be converted
+            into this type, using Chili. Should be a dataclass. If None, then the raw result dict will
+            be returned instead.
+        """
         params_dict = params_dict if params_dict else {}
         payload = self._rpc_request_dict(method, params_dict)
         url = URL_TEMPL.format(port=unity_port)
@@ -58,11 +72,14 @@ class UnityComms:
                     else:
                         raise CSException(err_data)
                 if ResultClass is None:
-                    return None
+                    return res_d["result"]
                 response = init_dataclass(res_d["result"], ResultClass)
             except requests.exceptions.ConnectionError:
-                print("requests.exceptions.ConnectionError => ignoring, retrying")
-                time.sleep(0.1)
+                if retry:
+                    print("requests.exceptions.ConnectionError => ignoring, retrying")
+                    time.sleep(0.1)
+                else:
+                    return
             except CSException as e:
                 raise e
             except Exception as e:
