@@ -27,7 +27,6 @@ public class Simulation : MonoBehaviour {
 	List<INeedUpdate> registeredNeedUpdates = new List<INeedUpdate>();
 
 	private void OnValidate() {
-		Debug.Log("Onvalidate");
 		if(RealStepSize < 0.001f) {
 			RealStepSize = 0.005f;
 		}
