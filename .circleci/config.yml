@@ -12,7 +12,11 @@ jobs:
           command: |
             bash ci/build-ci.sh
       - store_artifacts:
-          path: PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie*
+          path: PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie.dll
+      - store_artifacts:
+          path: PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie.deps.json
+      - store_artifacts:
+          path: PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie.pdb
 
 workflows:
   main:
