@@ -25,7 +25,6 @@ You need to install both into Unity project, and into your Python environment.
     - click on 'artifacts' tab
     - click on 'PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie.dll', to download it
 - copy `PeacefulPie.dll` into your Unity project's `Plugins` folder
-    - in Unity, got to Plugins, click on `PeacefulPie.dll`, and in 'Inspector' unselect 'validate references', and click 'Apply'
 - if on Mac silicon:
     - in Unity, goto Plugins, click on `PeacefulPie.dll`
     - in Inspector, change 'CPU' setting from 'Intel' to 'Any CPU', then click 'Apply'
