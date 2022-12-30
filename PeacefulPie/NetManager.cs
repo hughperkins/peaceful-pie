@@ -9,7 +9,7 @@ using AustinHarris.JsonRpc;
 using UnityEngine;
 
 
-class NetworkEvent{
+class NetworkEvent {
 	// contains request from client, space for reply from server,
 	// and a thread signaling thing so client can wait for reply
 	// we'll keep everything as json strings here, and do the conversion
@@ -26,21 +26,30 @@ class NetworkEvent{
 
 public class NetManager : MonoBehaviour {
 	[Tooltip("Network port to listen on.")]
-    public int ListenPort = 9000;
+	public int ListenPort = 9000;
 	[Tooltip("Network address to listen on. If not sure, put 'localhost'")]
-    public string ListenAddress = "localhost";
+	public string ListenAddress = "localhost";
 	[Tooltip("Optional filepath to write logs to.")]
 	public string? LogFilepath;
 	[Tooltip("milliseconds to sleep after writing to logfile. Helps prevent runaway logs")]
 	public int SleepAfterLogLineMilliseconds = 100;
+	[Tooltip("Ensure the application runs in background. If you set this to false, you might wonder why your python scripts appears to hang")]
+	public bool AutoEnableRunInBackground = true;
+	[Tooltip("If set to true, than we listen for network requested with a blocking listen. " +
+		"This will run *much* faster than non-blocking, " +
+		"but be aware if the python stops sending, then the editor will freeze, and the only " +
+		"solution (other than restarting a python sender), is to Force Quit the Unity " +
+		"Editor. (Best to set this programatically, on command from the python client, and have the client set back " +
+		"to non-blocking, when it exits")]
+	public bool blockingListen = false;
 
 	HttpListener? listener;
 	BlockingCollection<NetworkEvent> networkEvents = new BlockingCollection<NetworkEvent>();
 
 	void MyDebug(string msg) {
 		if(LogFilepath != null) {
-			string DateTime = System.DateTime.Now.ToString("yyyyMMdd HH:mm:ss.fff"); 
-			using (StreamWriter sw = File.AppendText(LogFilepath)) {
+			string DateTime = System.DateTime.Now.ToString("yyyyMMdd HH:mm:ss.fff");
+			using(StreamWriter sw = File.AppendText(LogFilepath)) {
 				sw.WriteLine($"{DateTime} {msg}");
 			}
 			Thread.Sleep(SleepAfterLogLineMilliseconds);
@@ -49,12 +58,47 @@ public class NetManager : MonoBehaviour {
 
 	bool isDedicated;
 
-	public bool IsDedicated()
-	{
+	class RpcService : JsonRpcService {
+		// this is only for turning blocking on/off
+		NetManager netManager;
+		public RpcService(NetManager netManager) {
+			this.netManager = netManager;
+		}
+		[JsonRpcMethod]
+		private void setBlockingListen(bool blocking)
+		{
+			// if blocking is true, then we listen for requests from python
+			// using a blocking listen. This will run faster than non-blocking,
+			// but if the python stops sending, then the editor will freeze, and the only
+			// solution (other than restarting a python sender), is to Force Quit the Unity
+			// Editor.
+			this.netManager.SetBlocking(blocking);
+		}
+	}
+
+	RpcService? rpcService;
+
+	private void Awake() {
+		rpcService = new RpcService(this);
+		if (AutoEnableRunInBackground) {
+			Application.runInBackground = true;
+			Debug.Log("Enabled Application.runInBackground");
+		} else
+		{
+			Debug.Log("Warning: NOT enabling Application.runInBackground. This means you will need to switch Unity to foreground for things to run.");
+		}
+	}
+
+	public void SetBlocking(bool blocking) {
+		Debug.Log($"Setting blocking network listen to {blocking}");
+		this.blockingListen = blocking;
+	}
+
+	public bool IsDedicated() {
 		return Screen.currentResolution.refreshRate == 0;
 	}
 
-    public void OnEnable() {
+	public void OnEnable() {
 		isDedicated = IsDedicated();
 
 		string[] args = System.Environment.GetCommandLineArgs();
@@ -74,9 +118,10 @@ public class NetManager : MonoBehaviour {
 
 		listener.Start();
 		Task.Run(listenLoop);
-    }
+		MyDebug($"Started listener, on address {ListenAddress} port {ListenPort}");
+	}
 
-    public void OnDisable() {
+	public void OnDisable() {
 		Debug.Log("shutting down listener");
 		if(listener is null) {
 			return;
@@ -88,7 +133,7 @@ public class NetManager : MonoBehaviour {
 
 	void FixedUpdate() {
 		int numIts = 0;
-		if(networkEvents.Count > 0 || isDedicated) {
+		if(networkEvents.Count > 0 || blockingListen || isDedicated) {
 			NetworkEvent networkEvent = networkEvents.Take();
 			networkEvent.serverReply = JsonRpcProcessor.ProcessSync(
 				Handler.DefaultSessionId(), networkEvent.clientRequest, null);
@@ -101,8 +146,7 @@ public class NetManager : MonoBehaviour {
 		HttpListenerRequest req = context.Request;
 
 		string bodyText;
-		using(var reader = new StreamReader(req.InputStream, req.ContentEncoding))
-		{
+		using(var reader = new StreamReader(req.InputStream, req.ContentEncoding)) {
 			bodyText = reader.ReadToEnd();
 		}
 
@@ -137,15 +181,12 @@ public class NetManager : MonoBehaviour {
 		handleRequest(context);
 	}
 
-	void listenLoop()
-	{
-		File.OpenWrite("netmanager-log.txt").Close();
-		while (true)
-		{
+	void listenLoop() {
+		File.OpenWrite(LogFilepath).Close();
+		while(true) {
 			try {
 				listenOnce();
-			}
-			catch(ObjectDisposedException) {
+			} catch(ObjectDisposedException) {
 				MyDebug("objectdisposedexception");
 				if(gameObject.activeSelf) {
 					MyDebug("Looks like we are supposed to be still active. Lets reopen...");
@@ -153,8 +194,7 @@ public class NetManager : MonoBehaviour {
 						if(listener != null) {
 							listener.Abort();
 						}
-					}
-					catch(Exception e) {
+					} catch(Exception e) {
 						MyDebug($"exception during attempted abort {e}");
 						MyDebug($"(Ignoring exception))");
 					}
@@ -164,8 +204,7 @@ public class NetManager : MonoBehaviour {
 
 						listener.Start();
 						MyDebug($"Restarted listener");
-					}
-					catch(Exception e) {
+					} catch(Exception e) {
 						MyDebug($"error when trying to restart listener {e}");
 						throw e;
 					}
@@ -173,19 +212,16 @@ public class NetManager : MonoBehaviour {
 					// shutdown
 					break;
 				}
-			}
-			catch(System.Net.HttpListenerException e) {
+			} catch(System.Net.HttpListenerException e) {
 				if(e.Message == "Listener closed") {
 					MyDebug("listener closed");
 					break;
 				}
 				MyDebug($"HttpListenerException caught in httplistener {e}");
-			}
-			catch(System.Threading.ThreadAbortException) {
+			} catch(System.Threading.ThreadAbortException) {
 				MyDebug("threadabortexception");
 				break;
-			}
-			catch(Exception e) {
+			} catch(Exception e) {
 				MyDebug($"Exception caught in httplistener {e}");
 			}
 		}
