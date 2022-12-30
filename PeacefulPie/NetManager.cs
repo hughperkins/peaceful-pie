@@ -133,6 +133,11 @@ public class NetManager : MonoBehaviour {
 
 	void FixedUpdate() {
 		int numIts = 0;
+		// while (
+		// 	(networkEvents.Count > 0 && numIts == 0)
+		// 	|| (blockingListen && numIts < 10)
+		// 	|| (isDedicated && numIts == 0)
+		// ) {
 		if(networkEvents.Count > 0 || blockingListen || isDedicated) {
 			NetworkEvent networkEvent = networkEvents.Take();
 			networkEvent.serverReply = JsonRpcProcessor.ProcessSync(
@@ -225,5 +230,6 @@ public class NetManager : MonoBehaviour {
 				MyDebug($"Exception caught in httplistener {e}");
 			}
 		}
+		MyDebug("ListenLoop shut down.");
 	}
 }
