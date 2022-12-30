@@ -1,0 +1,16 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: hughperkins/unity-ci:latest
+    steps:
+      - checkout
+      - run:
+          name: Run
+          command: |
+            bash ci/build-ci.sh
+workflows:
+  sample:
+    jobs:
+      - build
