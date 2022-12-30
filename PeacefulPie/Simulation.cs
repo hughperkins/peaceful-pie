@@ -18,13 +18,21 @@ public class Simulation : MonoBehaviour {
 
 	[Header("Size of each simulation step, in seconds of game time.")]
 	public float SimulationStepSize = 0.02f;
-	[Header("Size of each simulation step, in real time. Make this smaller than Simulation Step Size to accelerate the game.")]
-	public float RealStepSize = 0.002f;
+	[Header("Size of each simulation step, in real time. Make this smaller than Simulation Step Size to accelerate the game. Must be more than 0.")]
+	public float RealStepSize = 0.005f;
 	[Tooltip("Automatically run a simulation step each FixedStep?")]
 	public bool AutoRunSimulations = false;
 
 	List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
 	List<INeedUpdate> registeredNeedUpdates = new List<INeedUpdate>();
+
+	private void OnValidate() {
+		Debug.Log("Onvalidate");
+		if(RealStepSize < 0.001f) {
+			RealStepSize = 0.005f;
+		}
+		Time.fixedDeltaTime = RealStepSize;
+	}
 
 	private void Awake() {
 		Physics.autoSimulation = false;
