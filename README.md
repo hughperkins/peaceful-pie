@@ -2,11 +2,15 @@
 
 Connect Python with Unity for reinforcement learning!
 
-## Installation
+# CI
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/hughperkins/peaceful-pie/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/hughperkins/peaceful-pie/tree/main)
+
+# Installation
 
 You need to install both into Unity project, and into your Python environment.
 
-### In Unity
+## In Unity
 
 - in Unity, in your project's "Assets" folder, create a "Plugins" folder, if it doesn't already exist
 - First install AustinHarris.JsonRPC:
@@ -15,13 +19,13 @@ You need to install both into Unity project, and into your Python environment.
     - unzip the resulting zip file
     - copy `lib/netstandard2.1/AustinHarris.JsonRpc.dll` into your `Plugins` folder
     - select the file, in your Plugins, and in 'Inspector' unselect 'validate references', and click 'Apply'
-- from this repo, copy `PeacefulPie.dll` into your `Plugins` folder
+- copy `PeacefulPie.dll` into your `Plugins` folder, from the latest build artifacts (click on the badge under 'CI' above)
     - select the file, in your Plugins, and in 'Inspector' unselect 'validate references', and click 'Apply'
 - if on Mac silicon, make sure to change 'CPU' to 'Any CPU', for each dll, clicking 'Apply' each time
 
 You should be good to go :)
 
-### In Python
+## In Python
 
 ```
 pip install -U peaceful-pie
@@ -36,4 +40,4 @@ pip install -U peaceful-pie
 
 # Dev
 
-Note: if you're on a Silicon Mac, and you're using Visual Studio Code, highly recommend downgrading the C# omnisharp extension to 24.4, which solves lots of weird error messages about references.
+I'm usng Visual Studio for Mac to write this.
