@@ -2,6 +2,7 @@ version: 2.1
 
 jobs:
   build:
+    resource_class: small
     docker:
       - image: hughperkins/unity-ci:latest
     steps:
