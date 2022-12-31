@@ -8,8 +8,6 @@ if command -v pyenv 1>/dev/null 2>&1; then
 fi
 eval "$(pyenv virtualenv-init -)"
 
-env
-
 pyenv virtualenv 3.10.9 myenv
 pyenv activate myenv
 git status
@@ -40,4 +38,4 @@ python -c 'import peaceful_pie; print(peaceful_pie.__version__)'
 poetry build --quiet
 find . -cmin -1
 ls -lh dist
-twine upload dist/*
+python -m twine upload dist/*
