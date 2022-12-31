@@ -20,7 +20,9 @@ public class Simulation : MonoBehaviour {
 	public float SimulationStepSize = 0.02f;
 	[Header("Size of each simulation step, in real time. Make this smaller than Simulation Step Size to accelerate the game. Must be more than 0.")]
 	public float RealStepSize = 0.005f;
-	[Tooltip("Automatically run a simulation step each FixedStep?")]
+	[Tooltip(
+		"Automatically run a simulation step each FixedStep? " +
+		"When under Python control, we usually want the Python will control when to run a simulation step, so this should be off.")]
 	public bool AutoRunSimulations = false;
 
 	List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
@@ -34,8 +36,10 @@ public class Simulation : MonoBehaviour {
 	}
 
 	private void Awake() {
-		Physics.autoSimulation = false;
 		Debug.Log("Turning off physics autosimulation");
+		Physics.autoSimulation = false;
+		Debug.Log($"Setting fixed delta time to {RealStepSize}");
+		Time.fixedDeltaTime = RealStepSize;
 	}
 
 	public void RegisterNeedFixedUpdate(INeedFixedUpdate needFixedUpdate) {
