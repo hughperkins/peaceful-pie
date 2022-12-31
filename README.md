@@ -20,8 +20,8 @@ You need to install both into Unity project, and into your Python environment.
     - copy `lib/netstandard2.1/AustinHarris.JsonRpc.dll` into your `Plugins` folder
     - select the file, in your Plugins, and in 'Inspector' unselect 'validate references', and click 'Apply'
 - click on the green badge under 'CI' above
-    - click on 'main' in the first row with a green 'Success' badge
-    - click on the 'build' box, that shows a white tick in a green circle
+    - click on 'build' in the first row with a green 'Success' badge
+    - click on the 'build-dotnet' box, that shows a white tick in a green circle
     - click on 'artifacts' tab
     - click on 'PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie.dll', to download it
 - copy `PeacefulPie.dll` into your Unity project's `Plugins` folder
