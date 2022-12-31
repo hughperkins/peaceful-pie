@@ -24,7 +24,30 @@ class UnityComms:
         return res
 
     def set_blocking_listen(self, unity_port: int, blocking: bool) -> None:
+        """
+        Be aware that once you turn on blocking listening, the editor will be unresponsive in between
+        rpc calls. So, be sure to turn off blocking listen before stopping your python script. In particular
+        you might want to use signal.signal to capture ctrl-c, and turn off blocking listens. Something like:
+
+
+        def on_exit(signum: int, frame: Any) -> None:
+            unity_comms.set_blocking_listen(port, False)
+            exit(0)
+
+        signal.signal(signal.SIGINT, on_exit)
+        unity_comms.set_blocking_listen(port, True)
+        # ... rest of program  here ...
+
+        """
         self.rpc_call(unity_port, "setBlockingListen", {"blocking": blocking}, retry=False)
+
+    def set_autosimulation(self, unity_port: int, auto_simulation: bool) -> None:
+        """
+        You should call this to turn off autosimulation prior to running any reinforcement learning
+        algorithm. Otherwise your environment risks stepping in between your reinforcement learning
+        steps :P
+        """
+        self.rpc_call(unity_port, "setAutosimulation", {"autosimulation": auto_simulation})
 
     def rpc_call(
         self,

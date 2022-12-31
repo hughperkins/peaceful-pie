@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using AustinHarris.JsonRpc;
 
 public interface INeedFixedUpdate {
 	void MyFixedUpdate(float deltaTime);
@@ -35,6 +36,21 @@ public class Simulation : MonoBehaviour {
 	List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
 	List<INeedUpdate> registeredNeedUpdates = new List<INeedUpdate>();
 
+	Rpc rpc;
+
+	class Rpc : JsonRpcService {
+		Simulation simulation;
+		public Rpc(Simulation simulation)
+		{
+			this.simulation = simulation;
+		}
+		[JsonRpcMethod]
+		void setAutosimulation(bool autosimulation) {
+			simulation.AutoRunSimulations = autosimulation;
+			Debug.Log($"Setting Simulation.AutoRunSimulations to {autosimulation}");
+		}
+	}
+
 	public bool isDedicated() {
 		return Screen.currentResolution.refreshRate == 0;
 	}
@@ -56,6 +72,8 @@ public class Simulation : MonoBehaviour {
 	private void Awake() {
 		Debug.Log("Turning off physics autosimulation");
 		Physics.autoSimulation = false;
+
+		rpc = new Rpc(this);
 
 		Debug.Log("is dedicated " + isDedicated());
 		if(isDedicated()) {
