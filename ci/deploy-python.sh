@@ -11,5 +11,5 @@ eval "$(pyenv virtualenv-init -)"
 pyenv virtualenv 3.10.9 myenv
 pyenv activate myenv
 git status
-poetry install --verbose --no-interactive
+poetry install --verbose --no-interaction
 poetry build -v
