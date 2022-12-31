@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  build:
+  build-dotnet:
     resource_class: small
     docker:
       - image: hughperkins/unity-ci:latest
@@ -18,7 +18,27 @@ jobs:
       - store_artifacts:
           path: PeacefulPie/bin/Debug/netstandard2.1/PeacefulPie.pdb
 
+  deploy-python:
+    resource_class: small
+    docker:
+      - image: cimg/python:3.10.9
+    steps:
+      - checkout
+      - run:
+          name: Run
+          command: |
+            bash ci/deploy-python.sh
+
 workflows:
   main:
     jobs:
-      - build
+      - build-dotnet:
+          filters:
+            tags:
+              only: /.*/
+      - deploy-python:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
