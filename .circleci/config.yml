@@ -27,6 +27,7 @@ jobs:
       - run:
           name: Run
           command: |
+            poetry self add "poetry-dynamic-versioning[plugin]"
             bash ci/deploy-python.sh
 
 workflows:
