@@ -35,10 +35,6 @@ jobs:
           command: |
             bash ci/deploy-python.sh
 
-# 'curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -'
-# 'curl -sSL https://install.python-poetry.org | python3 -'
-# 'poetry self add "poetry-dynamic-versioning[plugin]"'
-
 workflows:
   build:
     jobs:
@@ -48,7 +44,7 @@ workflows:
               only: /.*/
       - deploy-python:
           filters:
-            # branches:
-            #   ignore: /.*/
+            branches:
+              ignore: /.*/
             tags:
               only: /^v.*/
