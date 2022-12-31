@@ -30,12 +30,14 @@ jobs:
             bash ci/deploy-python.sh
 
 workflows:
-  main:
+  build-dotnet:
     jobs:
       - build-dotnet:
           filters:
             tags:
               only: /.*/
+  deploy-python:
+    jobs:
       - deploy-python:
           filters:
             branches:
