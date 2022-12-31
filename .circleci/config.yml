@@ -38,7 +38,7 @@ workflows:
               only: /.*/
       - deploy-python:
           filters:
-            branches:
-              ignore: /.*/
+            # branches:
+            #   ignore: /.*/
             tags:
               only: /^v.*/
