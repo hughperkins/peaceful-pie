@@ -57,6 +57,7 @@ public class NetManager : MonoBehaviour {
 	}
 
 	bool isDedicated;
+	volatile bool isEnabled = true;
 
 	class RpcService : JsonRpcService {
 		// this is only for turning blocking on/off
@@ -99,6 +100,7 @@ public class NetManager : MonoBehaviour {
 	}
 
 	public void OnEnable() {
+		isEnabled = true;
 		isDedicated = IsDedicated();
 
 		string[] args = System.Environment.GetCommandLineArgs();
@@ -122,6 +124,7 @@ public class NetManager : MonoBehaviour {
 	}
 
 	public void OnDisable() {
+		isEnabled = false;
 		Debug.Log("shutting down listener");
 		if(listener is null) {
 			return;
@@ -196,9 +199,8 @@ public class NetManager : MonoBehaviour {
 				listenOnce();
 			} catch(ObjectDisposedException) {
 				MyDebug("objectdisposedexception");
-				MyDebug($"gameObject {gameObject}");
-				MyDebug($"gameObject.activeSelf {gameObject.activeSelf}");
-				if(gameObject.activeSelf) {
+				MyDebug($"isEnabled {isEnabled}");
+				if(isEnabled) {
 					MyDebug("Looks like we are supposed to be still active. Lets reopen...");
 					try {
 						if(listener != null) {
