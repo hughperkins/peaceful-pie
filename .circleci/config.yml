@@ -27,7 +27,9 @@ jobs:
       - run:
           name: Run
           command: |
-            poetry self add "poetry-dynamic-versioning[plugin]"
+            'curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -'
+            'curl -sSL https://install.python-poetry.org | python3 -'
+            'poetry self add "poetry-dynamic-versioning[plugin]"'
             bash ci/deploy-python.sh
 
 workflows:
