@@ -187,12 +187,17 @@ public class NetManager : MonoBehaviour {
 	}
 
 	void listenLoop() {
-		File.OpenWrite(LogFilepath).Close();
+		if (LogFilepath != null && LogFilepath != "")
+		{
+			File.OpenWrite(LogFilepath).Close();
+		}
 		while(true) {
 			try {
 				listenOnce();
 			} catch(ObjectDisposedException) {
 				MyDebug("objectdisposedexception");
+				MyDebug($"gameObject {gameObject}");
+				MyDebug($"gameObject.activeSelf {gameObject.activeSelf}");
 				if(gameObject.activeSelf) {
 					MyDebug("Looks like we are supposed to be still active. Lets reopen...");
 					try {
