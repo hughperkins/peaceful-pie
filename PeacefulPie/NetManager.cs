@@ -35,13 +35,10 @@ public class NetManager : MonoBehaviour {
 	public int SleepAfterLogLineMilliseconds = 100;
 	[Tooltip("Ensure the application runs in background. If you set this to false, you might wonder why your python scripts appears to hang")]
 	public bool AutoEnableRunInBackground = true;
-	[Tooltip("If set to true, than we listen for network requested with a blocking listen. " +
-		"This will run *much* faster than non-blocking, " +
-		"but be aware if the python stops sending, then the editor will freeze, and the only " +
-		"solution (other than restarting a python sender), is to Force Quit the Unity " +
-		"Editor. (Best to set this programatically, on command from the python client, and have the client set back " +
-		"to non-blocking, when it exits")]
-	public bool blockingListen = false;
+
+	bool blockingListen = false;
+	bool isDedicated;
+	volatile bool isEnabled = true;
 
 	HttpListener? listener;
 	BlockingCollection<NetworkEvent> networkEvents = new BlockingCollection<NetworkEvent>();
@@ -55,9 +52,6 @@ public class NetManager : MonoBehaviour {
 			Thread.Sleep(SleepAfterLogLineMilliseconds);
 		}
 	}
-
-	bool isDedicated;
-	volatile bool isEnabled = true;
 
 	class RpcService : JsonRpcService {
 		// this is only for turning blocking on/off
