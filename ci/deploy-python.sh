@@ -34,3 +34,5 @@ poetry self add --quiet "poetry-dynamic-versioning[plugin]"
 
 poetry install --quiet --no-interaction
 poetry build --quiet
+find . -cmin -1
+ls deps
