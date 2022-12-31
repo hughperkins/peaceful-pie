@@ -25,10 +25,12 @@ pip freeze
 python -c 'import peaceful_pie'
 python -c 'import peaceful_pie; print(peaceful_pie.__version__)'
 
+poetry self update --quiet
+
 # curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
 # curl -sSL https://install.python-poetry.org | python3 -
 
-poetry self add "poetry-dynamic-versioning[plugin]"
+poetry self add --quiet "poetry-dynamic-versioning[plugin]"
 
-poetry install --verbose --no-interaction
-poetry build -v
+poetry install --quiet --no-interaction
+poetry build --quiet
