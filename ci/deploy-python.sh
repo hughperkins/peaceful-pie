@@ -20,8 +20,13 @@ pip install colorama
 pip install boto3
 pip freeze
 
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
-curl -sSL https://install.python-poetry.org | python3 -
+pip install .
+pip freeze
+python -c 'import peaceful_pie'
+python -c 'import peaceful_pie; print(peaceful_pie.__version__)'
+
+# curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_UNINSTALL=1 python -
+# curl -sSL https://install.python-poetry.org | python3 -
 
 poetry self add "poetry-dynamic-versioning[plugin]"
 
