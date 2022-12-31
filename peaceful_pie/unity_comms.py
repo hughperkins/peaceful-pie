@@ -86,6 +86,7 @@ class UnityComms:
                 print("payload", payload)
                 print("res", res)
                 print("res.content", res.content)
+                print("e", e)
                 if self.logfile is not None:
                     with open(self.logfile, 'a') as f:
                         datetime_str = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
