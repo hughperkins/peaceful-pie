@@ -25,6 +25,12 @@ jobs:
     steps:
       - checkout
       - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = __token__" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
           name: Run
           command: |
             bash ci/deploy-python.sh
