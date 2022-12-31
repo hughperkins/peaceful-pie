@@ -8,9 +8,13 @@ if command -v pyenv 1>/dev/null 2>&1; then
 fi
 eval "$(pyenv virtualenv-init -)"
 
+env
+
 pyenv virtualenv 3.10.9 myenv
 pyenv activate myenv
 git status
+
+env
 
 pip install colorama
 pip install boto3
