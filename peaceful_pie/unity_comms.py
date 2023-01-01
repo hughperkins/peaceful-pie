@@ -1,8 +1,10 @@
+import atexit
 from contextlib import contextmanager
 import dataclasses
 from typing import Any, Generator, Optional, Type
 import datetime
 import time
+import subprocess
 import requests
 import chili
 
@@ -15,12 +17,47 @@ class CSException(Exception):
 
 
 class UnityComms:
-    def __init__(self, port: int, logfile: Optional[str] = None, hostname: str = "localhost") -> None:
+    def __init__(
+        self,
+        port: int,
+        server_executable_path: Optional[str] = None,
+        logfile: Optional[str] = None,
+        hostname: str = "localhost"
+    ) -> None:
+        """
+        :param port: int The port that Unity will run on. Always mandatory. If server_executable_path is provided, we
+            will start the server with commandline `--port {port}`
+        :param server_executable_path: Optional[str] Path to dedicatd server executable to run
+        :param logfile: Optional[str] Logfile to write to. Optional
+        :param hostname: str  If providing server_executable_path, must be 'localhost', otherwise the hostname where
+            the Unity process is running. Reminder that all network communications are insecure, so best to set this
+            to localhost. (For secure network communciations you could use e.g. ssh tunnels)
+        """
+        self.server_executable_path = server_executable_path
+        if server_executable_path is not None:
+            assert hostname == "localhost", "Must use hostname localhost if passing in server_executable_path"
         self.hostname = hostname
         self.port = port
         self.session = requests.Session()
         self.jsonrpc_id = 0
         self.logfile = logfile
+
+        self.server_process: Optional[subprocess.Popen] = None
+
+        if server_executable_path is not None:
+            atexit.register(self._kill_server)
+            self._start_server()
+
+    def _start_server(self) -> None:
+        assert self.server_executable_path is not None
+        cmd_line = [self.server_executable_path, '--port', str(self.port)]
+        print(cmd_line)
+        self.server_process = subprocess.Popen(cmd_line)
+
+    def _kill_server(self) -> None:
+        if self.server_process is not None:
+            print('killing server process')
+            self.server_process.kill()
 
     def _rpc_request_dict(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         res = {"method": method, "params": params, "jsonrpc": "2.0", "id": self.jsonrpc_id}
@@ -30,15 +67,17 @@ class UnityComms:
     @contextmanager
     def blocking_listen(self) -> Generator:
         """
-        This should be used from a with block, like:
+        Uses blocking listens for commands from the python side. Note that on a dedicated unity server, this is
+        automatic: no need to call this. This only has an affect when running against a non-dedicated Unity, typically
+        the Unity Editor.
+
+        To avoid blocking leaving the Editor blocked after the script exits, this should be used from a `with` block,
+        like:
 
         with unity_comms.blocking_listen():
             # do other stuff here
 
-        (This means we automatically attempt to unblock at the end)
-
-        (Note that this won't handle SIGTERM. I figure you can handle that yourself, using signal.signal,
-        if you want. Just get your exit function to run the rpc call you see here)
+        (This means we automatically attempt to remove the blocking listen from the Unity Editor, at the end)
         """
         self.rpc_call("setBlockingListen", {"blocking": True})
         try:
