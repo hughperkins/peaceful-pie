@@ -36,7 +36,7 @@ public class Simulation : MonoBehaviour {
 	List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
 	List<INeedUpdate> registeredNeedUpdates = new List<INeedUpdate>();
 
-	Rpc rpc;
+	Rpc? rpc;
 
 	class Rpc : JsonRpcService {
 		Simulation simulation;
@@ -48,6 +48,10 @@ public class Simulation : MonoBehaviour {
 		void setAutosimulation(bool autosimulation) {
 			simulation.AutoRunSimulations = autosimulation;
 			Debug.Log($"Setting Simulation.AutoRunSimulations to {autosimulation}");
+		}
+		[JsonRpcMethod]
+		bool getAutosimulation() {
+			return simulation.AutoRunSimulations;
 		}
 	}
 
