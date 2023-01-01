@@ -1,8 +1,9 @@
+import dataclasses
 from typing import Any, Optional, Type
 import datetime
 import time
 import requests
-from chili import init_dataclass
+import chili
 
 
 URL_TEMPL = "http://localhost:{port}/jsonrpc"
@@ -68,6 +69,12 @@ class UnityComms:
             be returned instead.
         """
         params_dict = params_dict if params_dict else {}
+        new_dict = {}
+        for k, v in params_dict.items():
+            if dataclasses.is_dataclass(v):
+                v = chili.asdict(v)
+            new_dict[k] = v
+        params_dict = new_dict
         payload = self._rpc_request_dict(method, params_dict)
         url = URL_TEMPL.format(port=unity_port)
         response = None
@@ -96,7 +103,7 @@ class UnityComms:
                         raise CSException(err_data)
                 if ResultClass is None:
                     return res_d["result"]
-                response = init_dataclass(res_d["result"], ResultClass)
+                response = chili.init_dataclass(res_d["result"], ResultClass)
             except requests.exceptions.ConnectionError:
                 if retry:
                     print("requests.exceptions.ConnectionError => ignoring, retrying")
