@@ -1,12 +1,13 @@
+from contextlib import contextmanager
 import dataclasses
-from typing import Any, Optional, Type
+from typing import Any, Generator, Optional, Type
 import datetime
 import time
 import requests
 import chili
 
 
-URL_TEMPL = "http://localhost:{port}/jsonrpc"
+URL_TEMPL = "http://{hostname}:{port}/jsonrpc"
 
 
 class CSException(Exception):
@@ -14,7 +15,9 @@ class CSException(Exception):
 
 
 class UnityComms:
-    def __init__(self, logfile: Optional[str] = None) -> None:
+    def __init__(self, port: int, logfile: Optional[str] = None, hostname: str = "localhost") -> None:
+        self.hostname = hostname
+        self.port = port
         self.session = requests.Session()
         self.jsonrpc_id = 0
         self.logfile = logfile
@@ -24,35 +27,38 @@ class UnityComms:
         self.jsonrpc_id += 1
         return res
 
-    def set_blocking_listen(self, unity_port: int, blocking: bool) -> None:
+    @contextmanager
+    def blocking_listen(self) -> Generator:
         """
-        Be aware that once you turn on blocking listening, the editor will be unresponsive in between
-        rpc calls. So, be sure to turn off blocking listen before stopping your python script. In particular
-        you might want to use signal.signal to capture ctrl-c, and turn off blocking listens. Something like:
+        This should be used from a with block, like:
 
+        with unity_comms.blocking_listen():
+            # do other stuff here
 
-        def on_exit(signum: int, frame: Any) -> None:
-            unity_comms.set_blocking_listen(port, False)
-            exit(0)
+        (This means we automatically attempt to unblock at the end)
 
-        signal.signal(signal.SIGINT, on_exit)
-        unity_comms.set_blocking_listen(port, True)
-        # ... rest of program  here ...
-
+        (Note that this won't handle SIGTERM. I figure you can handle that yourself, using signal.signal,
+        if you want. Just get your exit function to run the rpc call you see here)
         """
-        self.rpc_call(unity_port, "setBlockingListen", {"blocking": blocking}, retry=False)
+        self.rpc_call("setBlockingListen", {"blocking": True})
+        try:
+            yield None
+        finally:
+            self.rpc_call("setBlockingListen", {"blocking": False}, retry=False)
 
-    def set_autosimulation(self, unity_port: int, auto_simulation: bool) -> None:
+    def set_autosimulation(self, auto_simulation: bool) -> None:
         """
         You should call this to turn off autosimulation prior to running any reinforcement learning
         algorithm. Otherwise your environment risks stepping in between your reinforcement learning
         steps :P
         """
-        self.rpc_call(unity_port, "setAutosimulation", {"autosimulation": auto_simulation})
+        self.rpc_call("setAutosimulation", {"autosimulation": auto_simulation})
+
+    def get_autosimulation(self) -> bool:
+        return self.rpc_call("getAutosimulation")
 
     def rpc_call(
         self,
-        unity_port: int,
         method: str,
         params_dict: Optional[dict[str, Any]] = None,
         ResultClass: Optional[Type] = None,
@@ -76,7 +82,7 @@ class UnityComms:
             new_dict[k] = v
         params_dict = new_dict
         payload = self._rpc_request_dict(method, params_dict)
-        url = URL_TEMPL.format(port=unity_port)
+        url = URL_TEMPL.format(port=self.port, hostname=self.hostname)
         response = None
         while response is None:
             try:
