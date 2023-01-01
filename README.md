@@ -12,7 +12,12 @@ You need to install both into Unity project, and into your Python environment.
 
 ## In Unity
 
-- in Unity, in your project's "Assets" folder, create a "Plugins" folder, if it doesn't already exist
+- In Unity, go to Window | Package Manager
+    - change the dropdown in top left to 'Packages: In Project'
+    - check that Newtonsoft Json appears
+    - if Newtonsoft Json is not already in your project:
+        - click on the '+' in the top left, and choose 'Add package by name...'
+        - put the name `com.unity.nuget.newtonsoft-json`, then click 'Add'
 - First install AustinHarris.JsonRPC:
     - Download https://www.nuget.org/api/v2/package/AustinHarris.JsonRpc/1.2.3
     - rename to have filename suffix be `.zip` (you might need to turn on options to see all file extensions)
