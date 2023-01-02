@@ -80,7 +80,7 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
     [HideInInspector]
     public float Reward;
     public bool EpisodeFinished;
-    public bool AIEngaged;
+    // public bool AIEngaged;
     void Start()
     {
 		Application.runInBackground = true;
@@ -123,9 +123,9 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
     void EndEpisode() {
         // Debug.Log("end episode");
         EpisodeFinished = true;
-        if(!AIEngaged) {
-            ResetScene();
-        }
+        // if(!AIEngaged) {
+        //     ResetScene();
+        // }
     }
 
     public bool IsAlive() {
@@ -281,7 +281,7 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
         ResetScene();
         return new RLResult(
             0,
-            false,
+            EpisodeFinished,
             GetObservations()
         );
     }

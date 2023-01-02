@@ -55,23 +55,23 @@ public class PushAgentEscape : MonoBehaviour, IAgent, INeedUpdate
 
     public void MyUpdate(float deltaTime) {
         // Debug.Log("agent myupdate");
-        if(!m_GameController.AIEngaged) {
-            PlayerAction action = PlayerAction.nop;
-            if(Input.GetAxis("RotateX") > 0.1) {
-                action = PlayerAction.rotateRight;
-            } else if(Input.GetAxis("RotateX") < -0.1) {
-                action = PlayerAction.rotateLeft;
-            } else if(Input.GetAxis("Horizontal") > 0.1) {
-                action = PlayerAction.translateRight;
-            } else if(Input.GetAxis("Horizontal") < -0.1) {
-                action = PlayerAction.translateLeft;
-            } else if(Input.GetAxis("Vertical") < -0.1) {
-                action = PlayerAction.backward;
-            } else if(Input.GetAxis("Vertical") > 0.1) {
-                action = PlayerAction.forward;
-            }
-            ApplyAction(action, deltaTime);
-        }
+        // if(!m_GameController.AIEngaged) {
+        //     PlayerAction action = PlayerAction.nop;
+        //     if(Input.GetAxis("RotateX") > 0.1) {
+        //         action = PlayerAction.rotateRight;
+        //     } else if(Input.GetAxis("RotateX") < -0.1) {
+        //         action = PlayerAction.rotateLeft;
+        //     } else if(Input.GetAxis("Horizontal") > 0.1) {
+        //         action = PlayerAction.translateRight;
+        //     } else if(Input.GetAxis("Horizontal") < -0.1) {
+        //         action = PlayerAction.translateLeft;
+        //     } else if(Input.GetAxis("Vertical") < -0.1) {
+        //         action = PlayerAction.backward;
+        //     } else if(Input.GetAxis("Vertical") > 0.1) {
+        //         action = PlayerAction.forward;
+        //     }
+        //     ApplyAction(action, deltaTime);
+        // }
     }
 
     public PlayerObservation GetDeadObservation() {
