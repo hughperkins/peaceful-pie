@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using AustinHarris.JsonRpc;
 using UnityEngine;
 
-
 class NetworkEvent {
 	// contains request from client, space for reply from server,
 	// and a thread signaling thing so client can wait for reply
@@ -58,6 +57,19 @@ public class NetManager : MonoBehaviour {
 		NetManager netManager;
 		public RpcService(NetManager netManager) {
 			this.netManager = netManager;
+		}
+		[JsonRpcMethod]
+		void shutdownUnity() {
+			// This is intended for dedicatd servers that are spawned by UnityComms
+			Debug.Log("received shutdownUnity()");
+			Application.Quit();
+			Debug.Log("After application.quit()");
+			#if UNITY_EDITOR
+			UnityEditor.EditorApplication.isPlaying = false;
+			Debug.Log("after setting isPlaying to false");
+			#endif
+			System.Diagnostics.Process.GetCurrentProcess().Kill();
+			Debug.Log("after get current process . kill. hopefully we never get here :)");
 		}
 		[JsonRpcMethod]
 		private void setBlockingListen(bool blocking)
