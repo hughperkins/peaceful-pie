@@ -52,8 +52,6 @@ class UnityComms:
         self.jsonrpc_id = 0
         self.logfile = logfile
 
-        self.server_process: Optional[subprocess.Popen] = None
-
         if server_executable_path is not None:
             atexit.register(self._kill_server)
             self._start_server()
@@ -62,12 +60,11 @@ class UnityComms:
         assert self.server_executable_path is not None
         cmd_line = [self.server_executable_path, '--port', str(self.port)]
         print(cmd_line)
-        self.server_process = subprocess.Popen(cmd_line)
+        subprocess.Popen(cmd_line, )
 
-    def _kill_server(self) -> None:
-        if self.server_process is not None:
-            print('killing server process')
-            self.server_process.kill()
+    def _kill_server(self, *args: Any, **kwargs: Any) -> None:
+        print('Asking unity to die')
+        self.rpc_call('shutdownUnity', retry=False)
 
     def _rpc_request_dict(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         res = {"method": method, "params": params, "jsonrpc": "2.0", "id": self.jsonrpc_id}
@@ -107,6 +104,8 @@ class UnityComms:
         return self.rpc_call("getAutosimulation")
 
     def __getattr__(self, method_name: str) -> UnityCommsFn:
+        if method_name.startswith('_'):
+            raise AttributeError()
         return UnityCommsFn(unity_comms=self, method_name=method_name)
 
     def __getitem__(self, method_name: str) -> UnityCommsFn:
