@@ -16,6 +16,15 @@ class CSException(Exception):
     pass
 
 
+class UnityCommsFn:
+    def __init__(self, unity_comms: 'UnityComms', method_name: str):
+        self.unity_comms = unity_comms
+        self.method_name = method_name
+
+    def __call__(self, **kwargs: dict[str, Any]) -> Any:
+        return self.unity_comms.rpc_call(method=self.method_name, params_dict=kwargs)
+
+
 class UnityComms:
     def __init__(
         self,
@@ -96,12 +105,19 @@ class UnityComms:
     def get_autosimulation(self) -> bool:
         return self.rpc_call("getAutosimulation")
 
+    def __getattr__(self, method_name: str) -> UnityCommsFn:
+        return UnityCommsFn(unity_comms=self, method_name=method_name)
+
+    def __getitem__(self, method_name: str) -> UnityCommsFn:
+        return UnityCommsFn(unity_comms=self, method_name=method_name)
+
     def rpc_call(
         self,
         method: str,
         params_dict: Optional[dict[str, Any]] = None,
         ResultClass: Optional[Type] = None,
-        retry: bool = True
+        retry: bool = True,
+        **kwargs: dict[str, Any]
     ) -> Any:
         """
         :param unity_port: int The Port that our Unity application is listening on
@@ -112,8 +128,10 @@ class UnityComms:
         :param ResultClass: Optional[Type] If not None, then the returned json dict will be converted
             into this type, using Chili. Should be a dataclass. If None, then the raw result dict will
             be returned instead.
+        :param **kwargs: dict[str, Any]  You can also simply pass in parameters by name
         """
         params_dict = params_dict if params_dict else {}
+        params_dict.update(kwargs)
         new_dict = {}
         for k, v in params_dict.items():
             if dataclasses.is_dataclass(v):
