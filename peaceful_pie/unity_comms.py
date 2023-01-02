@@ -21,8 +21,9 @@ class UnityCommsFn:
         self.unity_comms = unity_comms
         self.method_name = method_name
 
-    def __call__(self, ResultClass: Optional[Type] = None, **kwargs: Any) -> Any:
-        return self.unity_comms.rpc_call(method=self.method_name, params_dict=kwargs, ResultClass=ResultClass)
+    def __call__(self, ResultClass: Optional[Type] = None, retry: bool = True, **kwargs: Any) -> Any:
+        return self.unity_comms.rpc_call(
+            method=self.method_name, retry=retry, params_dict=kwargs, ResultClass=ResultClass)
 
 
 class UnityComms:
