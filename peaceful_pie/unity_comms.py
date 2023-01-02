@@ -174,6 +174,8 @@ class UnityComms:
                 else:
                     return
             except CSException as e:
+                print("payload", payload)
+                print("res", res)
                 raise e
             except Exception as e:
                 print("payload", payload)
