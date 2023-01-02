@@ -1,6 +1,6 @@
 # Examples
 
-## SimpleNetworking
+## [SimpleNetworking](SimpleNetworking)
 
 Send primitive types and dataclasses to and from Unity
 
