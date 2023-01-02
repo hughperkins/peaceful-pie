@@ -6,6 +6,10 @@ Connect Python with Unity for reinforcement learning!
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/hughperkins/peaceful-pie/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/hughperkins/peaceful-pie/tree/main)
 
+# Examples
+
+- see [examples](examples)
+
 # Installation
 
 You need to install both into Unity project, and into your Python environment.
