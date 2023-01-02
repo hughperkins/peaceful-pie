@@ -29,14 +29,18 @@ def dump_params_counts(net: torch.nn.Module) -> int:
 def run(args: argparse.Namespace) -> None:
     class EnvFactory:
         def __init__(self, port: int, server_executable_path: Optional[str]):
+            # I think this gets pickled into a new process
             self.port = port
             self.server_executable_path = server_executable_path
-
-        def __call__(self) -> MyUnityEnv:
-            unity_comms = UnityComms(
+            self.unity_comms = UnityComms(
                 port=self.port,
                 server_executable_path=self.server_executable_path)
-            my_unity_env = MyUnityEnv(comms=unity_comms)
+
+        def __call__(self) -> MyUnityEnv:
+            # I think this bit magically gets run in a different process
+            # UnityComms itself cannot be pickled, if it has started another server
+            # process, since the server process handle is not pickleable
+            my_unity_env = MyUnityEnv(comms=self.unity_comms)
             return my_unity_env
 
     env_factories = [
