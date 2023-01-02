@@ -14,7 +14,7 @@ __pycache__.meta
 */[Bb]uild/
 */[Bb]uilds/
 */Assets/AssetStoreTools*
-*/Assets/Plugins*
+# */Assets/Plugins*
 */Assets/Demonstrations*
 */Assets/ML-Agents/Timers*
 */csharp_timers.json
