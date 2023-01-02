@@ -1,6 +1,6 @@
 # Dungeon Escape
 
-Tested using peaceful-pie 1.3.0
+Tested using peaceful-pie 1.4.0
 
 This runs WITHOUT mlagents. It does not use POCA, but my own experients showed that this configuration learns faster and better than the POCA configuration provided by mlagents in https://github.com/Unity-Technologies/ml-agents/blob/5b6cb9878c611d5c50585f6400ebb8fe16ee8f1f/config/poca/DungeonEscape.yaml
 
