@@ -1,0 +1,5 @@
+peaceful-pie~=1.3.0
+pytest
+mlflow-skinny
+stable_baselines3
+torch
