@@ -19,11 +19,15 @@ public class RayResults {
 
 public class RayCasts : MonoBehaviour {
 	[Tooltip("Consider the rays form a low-resolution image. This is the x-resolution of that image.")]
+	[Range(1, 100)]
 	public int XResolution = 5;
 	[Tooltip("Consider the rays form a low-resolution image. This is the y-resolution of that image.")]
+	[Range(1, 100)]
 	public int YResolution = 5;
 	[Tooltip("What is the total horizontal angle subtended by the rays? (60 is good default)")]
+	[Range(0, 360)]
 	public int XTotalAngle = 60;
+	[Range(0, 360)]
 	[Tooltip("What is the total vertical angle subtended by the rays? (60 is good default)")]
 	public int YTotalAngle = 60;
 	[Tooltip("Length of each ray")]
