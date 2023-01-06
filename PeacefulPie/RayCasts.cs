@@ -43,8 +43,8 @@ public class RayCasts : MonoBehaviour {
 	}
 
 	Vector3 RayDirection(int xIdx, int yIdx) {
-		float x_angle = XResolution > 1 ? XTotalAngle / (XResolution - 1) * xIdx - XTotalAngle / 2 : 0;
-		float y_angle = YResolution > 1 ? YTotalAngle / (YResolution - 1) * yIdx - YTotalAngle / 2 : 0;
+		float x_angle = XResolution > 1 ? XTotalAngle / (XResolution - 1.0f) * xIdx - XTotalAngle / 2.0f : 0;
+		float y_angle = YResolution > 1 ? YTotalAngle / (YResolution - 1.0f) * yIdx - YTotalAngle / 2.0f : 0;
 		Vector3 vec = Quaternion.Euler(y_angle, x_angle, 0) * Vector3.forward;
 		return vec;
 	}
