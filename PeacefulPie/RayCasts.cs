@@ -108,7 +108,7 @@ public class RayCasts : MonoBehaviour {
 	public RayResults GetZerodObservation() {
 		// for use if agent is dead, for example
 		if(DetectableTags.Count == 0) {
-			throw new PeacefulPieException("You must provide at least one detectabletag");
+			throw new PeacefulPieException("You must provide at least one detectabletag when using RayCasts");
 		}
 		List<List<float>> rayDistances = new List<List<float>>();
 		List<List<int>> rayHitObjectTypes = new List<List<int>>();
@@ -130,7 +130,7 @@ public class RayCasts : MonoBehaviour {
 
 	public RayResults GetObservation() {
 		if(DetectableTags.Count == 0) {
-			throw new PeacefulPieException("You must provide at least one detectabletag");
+			throw new PeacefulPieException("You must provide at least one detectabletag when using RayCasts");
 		}
 		List<List<float>> rayDistances = new List<List<float>>();
 		List<List<int>> rayHitObjectTypes = new List<List<int>>();
