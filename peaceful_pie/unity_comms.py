@@ -148,7 +148,7 @@ class UnityComms:
                     print("content is None => skipping")
                     continue
                 if res.content == "".encode("utf-8"):
-                    print("no json content detected => skipping")
+                    # no json content detected => retry
                     continue
                 if res.content.decode("utf-8").strip() == "":
                     print("stripped content is empty string => skipping")
