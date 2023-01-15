@@ -19,18 +19,21 @@ public class Simulation : MonoBehaviour {
 
 	[Tooltip("Size of each simulation step, in seconds of game time.")]
 	public float SimulationStepSize = 0.02f;
-	[Tooltip("Size of each simulation step, in real time. Make this smaller than Simulation Step Size to accelerate the game. Must be more than 0. " +
-		"You need to click Apply Real Step Size below, to apply any changes at runtime.")]
-	public float RealStepSize = 0.005f;
-	[Tooltip("Click this to apply the Real Step Size you set above, during runtime. (This is to avoid accidentally setting it to 0)")]
-	public bool ApplyRealStepSize = false;
-	[Tooltip("Size of each simulation step, in real time, on a dedicated server. Typically should be really small, e.g. 0.0001.")]
-	public float DedicatedRealStepSize = 0.0001f;
-	[Tooltip("Number of Updates to run per second, on a dedicated server. Typically should be small, such as 10.")]
+	[Tooltip("tldr; Controls the minimum time between network requests. " +
+	    "More detail: the PeacefulPie networking system hooks into Unity's event loop using FixedUpdate. " +
+		"Thus Fixed Delta Time limits the number of network requests we can process a second. " +
+		"Set this to smaller than Simulation Step Size to train faster than real time.")]
+	public float FixedDeltaTime = 0.005f;
+	[Tooltip("Click this to apply the Fixed Delta Time you set above, during runtime. " +
+	    "(This is to avoid accidentally setting it to 0, which locks the editor)")]
+	public bool ApplyFixedDeltaTime = false;
+	[Tooltip("Size of Fixed Delta Time, in real time, on a dedicated server. Typically should be really small, e.g. 0.0001.")]
+	public float DedicatedFixedDeltaTime = 0.0001f;
+	[Tooltip("Application Target Frame Rate, on a dedicated server. Typically should be relatively small, such as 10")]
 	public int DedicatedTargetFrameRate = 10;
 	[Tooltip(
-		"Automatically run a simulation step each FixedStep? " +
-		"When under Python control, we usually want the Python will control when to run a simulation step, so this should be off.")]
+		"Automatically run a simulation step every FixedUpdate? " +
+		"When under Python control, we usually want the Python client to control when to run a simulation step, so this should be off.")]
 	public bool AutoRunSimulations = false;
 
 	List<INeedFixedUpdate> registeredNeedFixedUpdates = new List<INeedFixedUpdate>();
@@ -60,14 +63,14 @@ public class Simulation : MonoBehaviour {
 	}
 
 	private void OnValidate() {
-		if(ApplyRealStepSize)
+		if(ApplyFixedDeltaTime)
 		{
-			if(RealStepSize == 0.0f) {
-				Debug.LogError("RealStepSize should not be 0");
+			if(FixedDeltaTime == 0.0f) {
+				Debug.LogError("FixedDeltaTime should not be 0");
 			} else
 			{
-				Time.fixedDeltaTime = RealStepSize;
-				ApplyRealStepSize = false;
+				Time.fixedDeltaTime = FixedDeltaTime;
+				ApplyFixedDeltaTime = false;
 				Debug.Log($"apply fixed delta time {Time.fixedDeltaTime}");
 			}
 		}
@@ -83,11 +86,10 @@ public class Simulation : MonoBehaviour {
 		if(isDedicated()) {
 			Application.targetFrameRate = DedicatedTargetFrameRate;
 			Debug.Log($"Set application target framerate to {Application.targetFrameRate}");
-			RealStepSize = DedicatedRealStepSize;
-			Debug.Log($"Set RealStepSize to {RealStepSize}");
+			FixedDeltaTime = DedicatedFixedDeltaTime;
 		}
-		Debug.Log($"Setting fixed delta time to {RealStepSize}");
-		Time.fixedDeltaTime = RealStepSize;
+		Debug.Log($"Setting fixed delta time to {FixedDeltaTime}");
+		Time.fixedDeltaTime = FixedDeltaTime;
 	}
 
 	public void RegisterNeedFixedUpdate(INeedFixedUpdate needFixedUpdate) {
