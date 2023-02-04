@@ -159,8 +159,8 @@ class MyPolicy(ActorCriticPolicy):
         print("self.PolicyNetwork", self.PolicyNetwork)
         self.mlp_extractor = self.PolicyNetwork(
             feature_dim=self.features_dim,  # type: ignore
-            last_layer_dim_pi=self.action_space.nvec.sum(),
-        )  # type: ignore
+            last_layer_dim_pi=self.action_space.nvec.sum(),  # type: ignore
+        )
 
     # def _passthru(self, *args: tuple[Any]) -> tuple[Any]:
     #     return args  # type: ignore
