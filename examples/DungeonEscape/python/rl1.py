@@ -1,20 +1,20 @@
 import argparse
 from functools import partial
 from os import path
-from typing import Optional
+from typing import Optional, Union
 
 import mlflow_logging
+import models
 import torch
+from gym import Env
+from my_unity_env import MyUnityEnv
 from sbs3_checkpoint_callback import SBS3CheckpointCallback
 from stable_baselines3 import PPO
-from stable_baselines3.common.policies import ActorCriticPolicy
-from stable_baselines3.common.vec_env import SubprocVecEnv, VecMonitor, VecEnv
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.policies import ActorCriticPolicy
+from stable_baselines3.common.vec_env import SubprocVecEnv, VecEnv, VecMonitor
 
 from peaceful_pie.unity_comms import UnityComms
-
-import models
-from my_unity_env import MyUnityEnv
 
 
 def dump_params_counts(net: torch.nn.Module) -> int:
@@ -33,8 +33,8 @@ def run(args: argparse.Namespace) -> None:
             self.port = port
             self.server_executable_path = server_executable_path
             self.unity_comms = UnityComms(
-                port=self.port,
-                server_executable_path=self.server_executable_path)
+                port=self.port, server_executable_path=self.server_executable_path
+            )
 
         def __call__(self) -> MyUnityEnv:
             # I think this bit magically gets run in a different process
@@ -47,7 +47,7 @@ def run(args: argparse.Namespace) -> None:
         EnvFactory(port=port, server_executable_path=args.server_executable_path)
         for port in args.ports
     ]
-    my_env: VecEnv
+    my_env: Union[Env, VecEnv]
     if len(args.ports) > 1:
         my_env = SubprocVecEnv(env_fns=env_factories)  # type: ignore
         my_env = VecMonitor(my_env)
@@ -93,16 +93,15 @@ def run(args: argparse.Namespace) -> None:
             net_arch=[dict(pi=[512, 512, 512], vf=[512, 512, 512])],
         ),
         "sharedpolicy": None,
-        "sharedboth": None
+        "sharedboth": None,
     }[args.policy_network]
-    policy: str | ActorCriticPolicy | partial[ActorCriticPolicy]
-    match args.policy_network:
-        case "sharedpolicy":
-            policy = partial(models.MyPolicy, PolicyNetwork=models.MySharedNetworkPolicy)
-        case "sharedboth":
-            policy = partial(models.MyPolicy, PolicyNetwork=models.MySharedNetworkBoth)
-        case _:
-            policy = "MlpPolicy"
+    policy: Union[str, ActorCriticPolicy, partial[ActorCriticPolicy]]
+    if args.policy_network == "sharedpolicy":
+        policy = partial(models.MyPolicy, PolicyNetwork=models.MySharedNetworkPolicy)
+    elif args.policy_network == "sharedboth":
+        policy = partial(models.MyPolicy, PolicyNetwork=models.MySharedNetworkBoth)
+    else:
+        policy = "MlpPolicy"
     ppo = PPO(
         env=my_env,
         policy=policy,  # type: ignore
@@ -137,16 +136,31 @@ def run(args: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--ports", type=int, nargs='+', default=[9000],
-        help='Provide more than one to run against multiple unity processes.')
-    parser.add_argument('--server-executable-path', type=str, help='optional path to dedicated server executable')
+        "--ports",
+        type=int,
+        nargs="+",
+        default=[9000],
+        help="Provide more than one to run against multiple unity processes.",
+    )
+    parser.add_argument(
+        "--server-executable-path",
+        type=str,
+        help="optional path to dedicated server executable",
+    )
     parser.add_argument("--ref", type=str, required=True)
     parser.add_argument("--no-mlflow", action="store_true")
     parser.add_argument(
         "--policy-network",
         type=str,
         default="sharedboth",
-        choices=["default", "3x128:relu", "3x256:relu", "3x512:relu", "sharedpolicy", "sharedboth"],
+        choices=[
+            "default",
+            "3x128:relu",
+            "3x256:relu",
+            "3x512:relu",
+            "sharedpolicy",
+            "sharedboth",
+        ],
     )
     parser.add_argument(
         "--checkpoint-epochs-multiplier",
@@ -154,6 +168,6 @@ if __name__ == "__main__":
         default=2,
         help="checkpoint epochs is power of this multiplier and checkpoint index",
     )
-    parser.add_argument('--ent-reg', default=0.001, type=float)
+    parser.add_argument("--ent-reg", default=0.001, type=float)
     args = parser.parse_args()
     run(args)

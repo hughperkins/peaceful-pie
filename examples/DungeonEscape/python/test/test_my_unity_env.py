@@ -7,12 +7,12 @@ except Exception:
     pass
 from unittest import mock
 
+import my_unity_env
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
 from peaceful_pie import ray_results_helper
-import my_unity_env
 
 
 @pytest.mark.parametrize(

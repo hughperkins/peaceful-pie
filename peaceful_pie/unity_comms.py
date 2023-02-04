@@ -1,13 +1,13 @@
 import atexit
-from contextlib import contextmanager
 import dataclasses
-from typing import Any, Dict, Generator, Optional, Type
 import datetime
-import time
 import subprocess
-import requests
-import chili
+import time
+from contextlib import contextmanager
+from typing import Any, Dict, Generator, Optional, Type
 
+import chili
+import requests
 
 URL_TEMPL = "http://{hostname}:{port}/jsonrpc"
 

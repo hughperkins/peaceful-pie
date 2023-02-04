@@ -1,11 +1,11 @@
 import argparse
 import time
 
+import mlflow_utils
+import my_unity_env
 from stable_baselines3 import PPO
 
 from peaceful_pie import unity_comms
-import mlflow_utils
-import my_unity_env
 
 
 def run(args: argparse.Namespace) -> None:

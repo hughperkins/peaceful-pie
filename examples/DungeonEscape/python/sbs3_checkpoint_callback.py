@@ -3,9 +3,8 @@ import os
 from os import path
 from typing import Optional
 
-from stable_baselines3.common.callbacks import BaseCallback
-
 from mlflow_logging import MLFlowLogger
+from stable_baselines3.common.callbacks import BaseCallback
 
 
 class SBS3CheckpointCallback(BaseCallback):
