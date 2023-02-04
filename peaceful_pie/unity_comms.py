@@ -1,7 +1,7 @@
 import atexit
 from contextlib import contextmanager
 import dataclasses
-from typing import Any, Generator, Optional, Type
+from typing import Any, Dict, Generator, Optional, Type
 import datetime
 import time
 import subprocess
@@ -66,7 +66,7 @@ class UnityComms:
         print('Asking unity to die')
         self.rpc_call('shutdownUnity', retry=False)
 
-    def _rpc_request_dict(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
+    def _rpc_request_dict(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
         res = {"method": method, "params": params, "jsonrpc": "2.0", "id": self.jsonrpc_id}
         self.jsonrpc_id += 1
         return res
@@ -114,10 +114,10 @@ class UnityComms:
     def rpc_call(
         self,
         method: str,
-        params_dict: Optional[dict[str, Any]] = None,
+        params_dict: Optional[Dict[str, Any]] = None,
         ResultClass: Optional[Type] = None,
         retry: bool = True,
-        **kwargs: dict[str, Any]
+        **kwargs: Dict[str, Any]
     ) -> Any:
         """
         :param unity_port: int The Port that our Unity application is listening on
@@ -141,6 +141,7 @@ class UnityComms:
         payload = self._rpc_request_dict(method, params_dict)
         url = URL_TEMPL.format(port=self.port, hostname=self.hostname)
         response = None
+        res = None
         while response is None:
             try:
                 res = self.session.post(url, json=payload)
@@ -180,14 +181,16 @@ class UnityComms:
             except Exception as e:
                 print("payload", payload)
                 print("res", res)
-                print("res.content", res.content)
+                if res is not None:
+                    print("res.content", res.content)
                 print("e", e)
                 if self.logfile is not None:
                     with open(self.logfile, 'a') as f:
                         datetime_str = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
                         f.write(f"{datetime_str}: payload {payload}\n")
                         f.write(f"{datetime_str}: res {res}\n")
-                        f.write(f"{datetime_str}: res.content {str(res.content)}\n")
+                        if res is not None:
+                            f.write(f"{datetime_str}: res.content {str(res.content)}\n")
                         f.write(f"{datetime_str}: e {e}\n")
                 time.sleep(0.1)
         return response

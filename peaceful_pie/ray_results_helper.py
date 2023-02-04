@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
@@ -6,8 +7,8 @@ from numpy.typing import NDArray
 
 @dataclass
 class RayResults:
-    rayDistances: list[list[float]]
-    rayHitObjectTypes: list[list[int]]
+    rayDistances: List[List[float]]
+    rayHitObjectTypes: List[List[int]]
     NumObjectTypes: int
 
 

@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 import pytest
 from numpy.typing import NDArray
@@ -33,8 +34,8 @@ from peaceful_pie import ray_results_helper
     ],
 )
 def test_ray_results_to_feature_np(
-    distances: list[list[float]],
-    object_types: list[list[int]],
+    distances: List[List[float]],
+    object_types: List[List[int]],
     num_object_types: int,
     expected_results: NDArray[np.float32],
 ) -> None:
