@@ -13,33 +13,36 @@ class MySharedNetworkPolicy(nn.Module):
     each player shares same policy network. we have a separate value network.
     all are MLPs, no CNNs yet.
     """
-    def __init__(
-        self,
-        feature_dim: int,
-        last_layer_dim_pi: int
-    ):
+
+    def __init__(self, feature_dim: int, last_layer_dim_pi: int):
         self.feature_dim = feature_dim
         self.latent_dim_pi = last_layer_dim_pi
         self.latent_dim_vf = 1
         super().__init__()
 
         print(
-            'MySharedNetwork1', 'feature_dim', feature_dim, 'last_layer_dim_pi',
-            last_layer_dim_pi)
+            "MySharedNetwork1",
+            "feature_dim",
+            feature_dim,
+            "last_layer_dim_pi",
+            last_layer_dim_pi,
+        )
 
         self.policy_net = torch.nn.Sequential(
             torch.nn.Linear(in_features=feature_dim // 3, out_features=128, bias=True),
             torch.nn.Tanh(),
             torch.nn.Linear(in_features=128, out_features=64, bias=True),
             torch.nn.Tanh(),
-            torch.nn.Linear(in_features=64, out_features=last_layer_dim_pi // 3, bias=True)
+            torch.nn.Linear(
+                in_features=64, out_features=last_layer_dim_pi // 3, bias=True
+            ),
         )
         self.value_net = torch.nn.Sequential(
             torch.nn.Linear(in_features=feature_dim, out_features=256, bias=True),
             torch.nn.Tanh(),
             torch.nn.Linear(in_features=256, out_features=64, bias=True),
             torch.nn.Tanh(),
-            torch.nn.Linear(in_features=64, out_features=1, bias=True)
+            torch.nn.Linear(in_features=64, out_features=1, bias=True),
         )
 
     def forward(self, features: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -64,26 +67,29 @@ class MySharedNetworkBoth(nn.Module):
     each player shares same policy network. we have a separate value network.
     all are MLPs, no CNNs yet.
     """
-    def __init__(
-        self,
-        feature_dim: int,
-        last_layer_dim_pi: int
-    ):
+
+    def __init__(self, feature_dim: int, last_layer_dim_pi: int):
         self.feature_dim = feature_dim
         self.latent_dim_pi = last_layer_dim_pi
         self.latent_dim_vf = 1
         super().__init__()
 
         print(
-            'MySharedNetwork1', 'feature_dim', feature_dim, 'last_layer_dim_pi',
-            last_layer_dim_pi)
+            "MySharedNetwork1",
+            "feature_dim",
+            feature_dim,
+            "last_layer_dim_pi",
+            last_layer_dim_pi,
+        )
 
         self.policy_net = torch.nn.Sequential(
             torch.nn.Linear(in_features=feature_dim // 3, out_features=128, bias=True),
             torch.nn.Tanh(),
             torch.nn.Linear(in_features=128, out_features=64, bias=True),
             torch.nn.Tanh(),
-            torch.nn.Linear(in_features=64, out_features=last_layer_dim_pi // 3, bias=True)
+            torch.nn.Linear(
+                in_features=64, out_features=last_layer_dim_pi // 3, bias=True
+            ),
         )
         self.value_net = torch.nn.Sequential(
             torch.nn.Linear(in_features=feature_dim // 3, out_features=128, bias=True),
@@ -91,7 +97,9 @@ class MySharedNetworkBoth(nn.Module):
             torch.nn.Linear(in_features=128, out_features=32, bias=True),
             torch.nn.Tanh(),
         )
-        self.value_fuse_net = torch.nn.Linear(in_features=32 * 3, out_features=1, bias=True)
+        self.value_fuse_net = torch.nn.Linear(
+            in_features=32 * 3, out_features=1, bias=True
+        )
 
     def forward(self, features: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         return self.forward_actor(features), self.forward_critic(features)
@@ -129,12 +137,12 @@ class MyPolicy(ActorCriticPolicy):
         *args: List[Any],
         **kwargs: Dict[str, Any],
     ):
-        print('MyPolicy.__init__()')
+        print("MyPolicy.__init__()")
         # Disable orthogonal initialization
         self.ortho_init = False
         self.action_space: gym.spaces.Space = action_space
         self.PolicyNetwork = PolicyNetwork
-        print('policynetwork', self.PolicyNetwork, PolicyNetwork)
+        print("policynetwork", self.PolicyNetwork, PolicyNetwork)
         super().__init__(
             observation_space,
             action_space,
@@ -147,11 +155,12 @@ class MyPolicy(ActorCriticPolicy):
         )
 
     def _build_mlp_extractor(self) -> None:
-        print('action_space.shape', self.action_space.shape)  # type: ignore
-        print('self.PolicyNetwork', self.PolicyNetwork)
+        print("action_space.shape", self.action_space.shape)  # type: ignore
+        print("self.PolicyNetwork", self.PolicyNetwork)
         self.mlp_extractor = self.PolicyNetwork(
             feature_dim=self.features_dim,  # type: ignore
-            last_layer_dim_pi=self.action_space.nvec.sum())  # type: ignore
+            last_layer_dim_pi=self.action_space.nvec.sum(),
+        )  # type: ignore
 
     # def _passthru(self, *args: tuple[Any]) -> tuple[Any]:
     #     return args  # type: ignore
