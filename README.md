@@ -54,6 +54,7 @@ pip install -U peaceful-pie
 - currently tested with:
     - python 3.10
     - Unity 2021.3.16.f1
+- support Python version: >=3.8.0, <4.0.0
 - please create an issue if your preferred platform is not supported (I'm guessing I might need to downgrade Python a little? Let me know!)
 
 # Dev
