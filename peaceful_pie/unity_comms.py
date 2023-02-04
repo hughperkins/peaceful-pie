@@ -17,13 +17,19 @@ class CSException(Exception):
 
 
 class UnityCommsFn:
-    def __init__(self, unity_comms: 'UnityComms', method_name: str):
+    def __init__(self, unity_comms: "UnityComms", method_name: str):
         self.unity_comms = unity_comms
         self.method_name = method_name
 
-    def __call__(self, ResultClass: Optional[Type] = None, retry: bool = True, **kwargs: Any) -> Any:
+    def __call__(
+        self, ResultClass: Optional[Type] = None, retry: bool = True, **kwargs: Any
+    ) -> Any:
         return self.unity_comms.rpc_call(
-            method=self.method_name, retry=retry, params_dict=kwargs, ResultClass=ResultClass)
+            method=self.method_name,
+            retry=retry,
+            params_dict=kwargs,
+            ResultClass=ResultClass,
+        )
 
 
 class UnityComms:
@@ -32,7 +38,7 @@ class UnityComms:
         port: int,
         server_executable_path: Optional[str] = None,
         logfile: Optional[str] = None,
-        hostname: str = "localhost"
+        hostname: str = "localhost",
     ) -> None:
         """
         :param port: int The port that Unity will run on. Always mandatory. If server_executable_path is provided, we
@@ -45,7 +51,9 @@ class UnityComms:
         """
         self.server_executable_path = server_executable_path
         if server_executable_path is not None:
-            assert hostname == "localhost", "Must use hostname localhost if passing in server_executable_path"
+            assert (
+                hostname == "localhost"
+            ), "Must use hostname localhost if passing in server_executable_path"
         self.hostname = hostname
         self.port = port
         self.session = requests.Session()
@@ -58,16 +66,23 @@ class UnityComms:
 
     def _start_server(self) -> None:
         assert self.server_executable_path is not None
-        cmd_line = [self.server_executable_path, '--port', str(self.port)]
+        cmd_line = [self.server_executable_path, "--port", str(self.port)]
         print(cmd_line)
-        subprocess.Popen(cmd_line, )
+        subprocess.Popen(
+            cmd_line,
+        )
 
     def _kill_server(self, *args: Any, **kwargs: Any) -> None:
-        print('Asking unity to die')
-        self.rpc_call('shutdownUnity', retry=False)
+        print("Asking unity to die")
+        self.rpc_call("shutdownUnity", retry=False)
 
     def _rpc_request_dict(self, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
-        res = {"method": method, "params": params, "jsonrpc": "2.0", "id": self.jsonrpc_id}
+        res = {
+            "method": method,
+            "params": params,
+            "jsonrpc": "2.0",
+            "id": self.jsonrpc_id,
+        }
         self.jsonrpc_id += 1
         return res
 
@@ -104,7 +119,7 @@ class UnityComms:
         return self.rpc_call("getAutosimulation")
 
     def __getattr__(self, method_name: str) -> UnityCommsFn:
-        if method_name.startswith('_'):
+        if method_name.startswith("_"):
             raise AttributeError()
         return UnityCommsFn(unity_comms=self, method_name=method_name)
 
@@ -117,7 +132,7 @@ class UnityComms:
         params_dict: Optional[Dict[str, Any]] = None,
         ResultClass: Optional[Type] = None,
         retry: bool = True,
-        **kwargs: Dict[str, Any]
+        **kwargs: Dict[str, Any],
     ) -> Any:
         """
         :param unity_port: int The Port that our Unity application is listening on
@@ -185,7 +200,7 @@ class UnityComms:
                     print("res.content", res.content)
                 print("e", e)
                 if self.logfile is not None:
-                    with open(self.logfile, 'a') as f:
+                    with open(self.logfile, "a") as f:
                         datetime_str = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
                         f.write(f"{datetime_str}: payload {payload}\n")
                         f.write(f"{datetime_str}: res {res}\n")

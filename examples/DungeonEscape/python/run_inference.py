@@ -10,8 +10,8 @@ import my_unity_env
 
 def run(args: argparse.Namespace) -> None:
     mlflow_loader = mlflow_utils.MlflowLoader(
-        experiment_name=args.experiment_name,
-        mlflow_uri=args.mlflow_uri)
+        experiment_name=args.experiment_name, mlflow_uri=args.mlflow_uri
+    )
 
     checkpoint_path = mlflow_loader.download_checkpoint(args.run_name, args.iterations)
 
@@ -30,26 +30,36 @@ def run(args: argparse.Namespace) -> None:
         for _ in range(args.frame_skip + 1):
             obs, rewards, dones, info = my_env.step(actions.tolist())
             if dones or step > 200:
-                print('resetting')
+                print("resetting")
                 obs = my_env.reset()
                 step = 0
                 break
         step += 1
-        print(f'\r{step}', end='', flush=True)
-        time.sleep(1/50 / args.accel)
+        print(f"\r{step}", end="", flush=True)
+        time.sleep(1 / 50 / args.accel)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # parser.add_argument("--checkpoint-path", type=str, required=True)
-    parser.add_argument("--run", type=str, required=True, help='format is: [run_name]:[iterations], eg foo:1024')
-    parser.add_argument("--experiment-name", type=str, default='unityml')
-    parser.add_argument("--mlflow-uri", type=str, default='http://localhost:5000')
+    parser.add_argument(
+        "--run",
+        type=str,
+        required=True,
+        help="format is: [run_name]:[iterations], eg foo:1024",
+    )
+    parser.add_argument("--experiment-name", type=str, default="unityml")
+    parser.add_argument("--mlflow-uri", type=str, default="http://localhost:5000")
     parser.add_argument("--port", type=int, default=9000)
-    parser.add_argument("--frame-skip", type=int, default=4, help='should match what was used for training')
+    parser.add_argument(
+        "--frame-skip",
+        type=int,
+        default=4,
+        help="should match what was used for training",
+    )
     parser.add_argument("--accel", type=float, default=1.0)
     args = parser.parse_args()
-    args.run_name, iterations = args.run.split(':')
+    args.run_name, iterations = args.run.split(":")
     args.iterations = int(iterations)
     iterations = None
     run(args)

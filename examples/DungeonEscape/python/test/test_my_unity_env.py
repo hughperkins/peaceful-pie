@@ -84,7 +84,9 @@ def test__player_observation_to_vec(
         )
     ],
 )
-def test_result_to_obs(rl_res: my_unity_env.RLResult, expected_vec: NDArray[np.float32]) -> None:
+def test_result_to_obs(
+    rl_res: my_unity_env.RLResult, expected_vec: NDArray[np.float32]
+) -> None:
     unity_comms = mock.Mock()
     unity_comms.reset.return_value = rl_res
     env = my_unity_env.MyUnityEnv(unity_comms)

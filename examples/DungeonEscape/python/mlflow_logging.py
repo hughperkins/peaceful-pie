@@ -64,12 +64,10 @@ class MLFlowLogger(KVWriter):
         key_excluded: Dict[str, Union[str, Tuple[str, ...]]],
         step: int = 0,
     ) -> None:
-
         metrics = {}
         for (key, value), (_, excluded) in zip(
             sorted(key_values.items()), sorted(key_excluded.items())
         ):
-
             if excluded is not None and "mlflow" in excluded:
                 continue
 

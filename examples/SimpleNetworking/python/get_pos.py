@@ -13,11 +13,11 @@ class MyVector3:
 def run(args: argparse.Namespace) -> None:
     unity_comms = UnityComms(port=args.port)
     res: MyVector3 = unity_comms.getPosition(ResultClass=MyVector3)
-    print('res', res, 'res.x', res.x)
+    print("res", res, "res.x", res.x)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--port', type=int, default=9000)
+    parser.add_argument("--port", type=int, default=9000)
     args = parser.parse_args()
     run(args)

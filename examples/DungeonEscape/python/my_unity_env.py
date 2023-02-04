@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Tuple
+from typing import Any, Dict, List, Tuple
 
 import gym
 import gym.spaces
@@ -20,7 +20,7 @@ class PlayerObservation:
 class RLResult:
     reward: float
     episodeFinished: bool
-    playerObservations: list[PlayerObservation]
+    playerObservations: List[PlayerObservation]
 
 
 class MyUnityEnv(gym.Env):
@@ -66,8 +66,8 @@ class MyUnityEnv(gym.Env):
         )
 
     def step(
-        self, actions: list[int]
-    ) -> Tuple[NDArray[np.float32], float, bool, dict[str, Any]]:
+        self, actions: List[int]
+    ) -> Tuple[NDArray[np.float32], float, bool, Dict[str, Any]]:
         action_strs = [
             [
                 "nop",
@@ -77,9 +77,11 @@ class MyUnityEnv(gym.Env):
             ][action]
             for action in actions
         ]
-        rl_result: RLResult = self.comms.rlStep(actions=action_strs, ResultClass=RLResult)
+        rl_result: RLResult = self.comms.rlStep(
+            actions=action_strs, ResultClass=RLResult
+        )
         obs = self._result_to_obs(rl_result)
-        info: dict[str, Any] = {"finished": rl_result.episodeFinished}
+        info: Dict[str, Any] = {"finished": rl_result.episodeFinished}
         return obs, rl_result.reward, rl_result.episodeFinished, info
 
     def close(self) -> None:

@@ -15,11 +15,11 @@ def run(args: argparse.Namespace) -> None:
     unity_comms.translate(translate=MyVector3(args.x, args.y, args.z))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--port', type=int, default=9000)
-    parser.add_argument('--x', type=float, default=0)
-    parser.add_argument('--y', type=float, default=0)
-    parser.add_argument('--z', type=float, default=0)
+    parser.add_argument("--port", type=int, default=9000)
+    parser.add_argument("--x", type=float, default=0)
+    parser.add_argument("--y", type=float, default=0)
+    parser.add_argument("--z", type=float, default=0)
     args = parser.parse_args()
     run(args)
