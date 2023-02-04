@@ -1,9 +1,11 @@
-from typing import Any, Callable, Optional, Type
-import torch
-from torch import nn
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+
 import gym
+import gym.spaces
+import torch
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.type_aliases import Schedule
+from torch import nn
 
 
 class MySharedNetworkPolicy(nn.Module):
@@ -40,7 +42,7 @@ class MySharedNetworkPolicy(nn.Module):
             torch.nn.Linear(in_features=64, out_features=1, bias=True)
         )
 
-    def forward(self, features: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, features: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         return self.forward_actor(features), self.forward_critic(features)
 
     def forward_actor(self, features: torch.Tensor) -> torch.Tensor:
@@ -91,7 +93,7 @@ class MySharedNetworkBoth(nn.Module):
         )
         self.value_fuse_net = torch.nn.Linear(in_features=32 * 3, out_features=1, bias=True)
 
-    def forward(self, features: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, features: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         return self.forward_actor(features), self.forward_critic(features)
 
     def forward_actor(self, features: torch.Tensor) -> torch.Tensor:
@@ -121,11 +123,11 @@ class MyPolicy(ActorCriticPolicy):
         observation_space: gym.spaces.Space,
         action_space: gym.spaces.Space,
         lr_schedule: Callable[[float], float],
-        net_arch: Optional[list[int | dict[str, list[int]]]] = None,
+        net_arch: Optional[Union[List[int], Dict[str, List[int]]]] = None,
         activation_fn: Type[nn.Module] = nn.Tanh,
         PolicyNetwork: Optional[Type[nn.Module]] = None,
-        *args: list[Any],
-        **kwargs: dict[str, Any],
+        *args: List[Any],
+        **kwargs: Dict[str, Any],
     ):
         print('MyPolicy.__init__()')
         # Disable orthogonal initialization
@@ -145,10 +147,10 @@ class MyPolicy(ActorCriticPolicy):
         )
 
     def _build_mlp_extractor(self) -> None:
-        print('action_space.shape', self.action_space.shape)
+        print('action_space.shape', self.action_space.shape)  # type: ignore
         print('self.PolicyNetwork', self.PolicyNetwork)
         self.mlp_extractor = self.PolicyNetwork(
-            feature_dim=self.features_dim,
+            feature_dim=self.features_dim,  # type: ignore
             last_layer_dim_pi=self.action_space.nvec.sum())  # type: ignore
 
     # def _passthru(self, *args: tuple[Any]) -> tuple[Any]:
