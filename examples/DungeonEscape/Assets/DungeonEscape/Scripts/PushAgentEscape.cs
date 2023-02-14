@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerObservation {
+public class PlayerObservation
+{
     public PlayerObservation(
         bool IAmAlive,
         bool IHaveAKey,
         RayResults rayResults
-    ) {
+    )
+    {
         this.IAmAlive = IAmAlive;
         this.IHaveAKey = IHaveAKey;
         this.rayResults = rayResults;
@@ -16,7 +18,8 @@ public class PlayerObservation {
     public RayResults rayResults;
 }
 
-public enum PlayerAction {
+public enum PlayerAction
+{
     nop,
     forward,
     backward,
@@ -53,7 +56,8 @@ public class PushAgentEscape : MonoBehaviour, IAgent, INeedUpdate
         simulation.RegisterNeedUpdate(this);
     }
 
-    public void MyUpdate(float deltaTime) {
+    public void MyUpdate(float deltaTime)
+    {
         // Debug.Log("agent myupdate");
         // if(!m_GameController.AIEngaged) {
         //     PlayerAction action = PlayerAction.nop;
@@ -74,7 +78,8 @@ public class PushAgentEscape : MonoBehaviour, IAgent, INeedUpdate
         // }
     }
 
-    public PlayerObservation GetDeadObservation() {
+    public PlayerObservation GetDeadObservation()
+    {
         RayResults rayResults = m_RayCasts.GetZerodObservation();
         PlayerObservation obs = new PlayerObservation(
             false,
@@ -84,7 +89,8 @@ public class PushAgentEscape : MonoBehaviour, IAgent, INeedUpdate
         return obs;
     }
 
-    public PlayerObservation GetObservation() {
+    public PlayerObservation GetObservation()
+    {
         RayResults rayResults = m_RayCasts.GetObservation();
         PlayerObservation obs = new PlayerObservation(
             true,
@@ -94,7 +100,8 @@ public class PushAgentEscape : MonoBehaviour, IAgent, INeedUpdate
         return obs;
     }
 
-    public bool IsAlive() {
+    public bool IsAlive()
+    {
         return gameObject.activeSelf;
     }
 
@@ -112,7 +119,8 @@ public class PushAgentEscape : MonoBehaviour, IAgent, INeedUpdate
     //     ApplyAction(action, Time.fixedDeltaTime);
     // }
 
-    public void ApplyAction(PlayerAction action, float deltaTime) {
+    public void ApplyAction(PlayerAction action, float deltaTime)
+    {
         var dirToGo = Vector3.zero;
         var rotateDir = Vector3.zero;
 

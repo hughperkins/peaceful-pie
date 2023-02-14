@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IAgent {
+public interface IAgent
+{
     PlayerObservation GetObservation();
     PlayerObservation GetDeadObservation();
-	void Reset();
-	void ApplyAction(PlayerAction action, float deltaTime);
+    void Reset();
+    void ApplyAction(PlayerAction action, float deltaTime);
 }
 
 public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
@@ -83,7 +84,7 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
     // public bool AIEngaged;
     void Start()
     {
-		Application.runInBackground = true;
+        Application.runInBackground = true;
         simulation = GetComponent<Simulation>();
         simulation.RegisterNeedFixedUpdate(this);
 
@@ -120,7 +121,8 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
         ResetScene();
     }
 
-    void EndEpisode() {
+    void EndEpisode()
+    {
         // Debug.Log("end episode");
         EpisodeFinished = true;
         // if(!AIEngaged) {
@@ -128,7 +130,8 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
         // }
     }
 
-    public bool IsAlive() {
+    public bool IsAlive()
+    {
         return gameObject.activeSelf;
     }
 
@@ -234,15 +237,18 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
         return Quaternion.Euler(0, Random.Range(0.0f, 360.0f), 0);
     }
 
-	// public void ApplyActions(List<PlayerAction> actions, float rlDeltaTime) {
-	public void Step(List<PlayerAction> actions, float rlDeltaTime) {
-        for(int i = 0; i < AgentsList.Count; i++) {
+    // public void ApplyActions(List<PlayerAction> actions, float rlDeltaTime) {
+    public void Step(List<PlayerAction> actions, float rlDeltaTime)
+    {
+        for (int i = 0; i < AgentsList.Count; i++)
+        {
             PlayerInfo playerInfo = AgentsList[i];
-		    playerInfo.Agent.ApplyAction(actions[i], rlDeltaTime);
+            playerInfo.Agent.ApplyAction(actions[i], rlDeltaTime);
         }
     }
 
-    public RLResult GetRLResult() {
+    public RLResult GetRLResult()
+    {
         // RunFixedUpdates(rlDeltaTime);
         List<PlayerObservation> observations = GetObservations();
         RLResult res = new RLResult(
@@ -250,32 +256,40 @@ public class DungeonEscapeEnvController : MonoBehaviour, INeedFixedUpdate
             EpisodeFinished,
             observations
         );
-        if(res.reward > 0) {
+        if (res.reward > 0)
+        {
             Debug.Log($"reward {res.reward} 🏆");
         }
-        if(res.reward < -0.1) {
+        if (res.reward < -0.1)
+        {
             Debug.Log($"reward {res.reward}");
         }
         Reward = 0;
         return res;
-	}
+    }
 
-	List<PlayerObservation> GetObservations() {
+    List<PlayerObservation> GetObservations()
+    {
         List<PlayerObservation> playerObservations = new List<PlayerObservation>();
-        for(int i = 0; i < AgentsList.Count; i++) {
+        for (int i = 0; i < AgentsList.Count; i++)
+        {
             PlayerInfo playerInfo = AgentsList[i];
             PlayerObservation obs;
-            if(playerInfo.Agent.gameObject.activeSelf) {
-    		    obs = playerInfo.Agent.GetObservation();
-            } else {
+            if (playerInfo.Agent.gameObject.activeSelf)
+            {
+                obs = playerInfo.Agent.GetObservation();
+            }
+            else
+            {
                 obs = playerInfo.Agent.GetDeadObservation();
             }
             playerObservations.Add(obs);
         }
-		return playerObservations;
-	}
+        return playerObservations;
+    }
 
-    public RLResult Reset() {
+    public RLResult Reset()
+    {
         // Debug.Log("New game 🎮");
         Debug.Log("-------------- New game 🎮 ------------------");
         ResetScene();

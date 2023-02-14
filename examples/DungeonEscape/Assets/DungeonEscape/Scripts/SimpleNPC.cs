@@ -19,11 +19,13 @@ public class SimpleNPC : MonoBehaviour, INeedFixedUpdate
         simulation.RegisterNeedFixedUpdate(this);
     }
 
-    public bool IsAlive() {
+    public bool IsAlive()
+    {
         return gameObject.activeSelf;
     }
 
-    public void MyFixedUpdate(float deltaTime) {
+    public void MyFixedUpdate(float deltaTime)
+    {
         dirToGo = target.position - transform.position;
         dirToGo.y = 0;
         rb.rotation = Quaternion.LookRotation(dirToGo);
