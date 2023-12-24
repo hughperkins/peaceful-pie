@@ -4,7 +4,7 @@ Connect Python with Unity for reinforcement learning!
 
 Video:
 
-[![Control Unity from Python WITHOUT mlagents](http://img.youtube.com/vi/RW8S8DhA_DI/0.jpg)](https://youtu.be/RW8S8DhA_DI "Control Unity from Python WITHOUT mlagents")
+[![Control Unity from Python WITHOUT mlagents](http://img.youtube.com/vi/RW8S8DhA_DI/0.jpg)](https://youtu.be/RW8S8DhA_DI)
 
 # CI
 
